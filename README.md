@@ -4,7 +4,8 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-Breakclone is a package for assessing clonal relationships of tumour pairs based on copy number or mutation data.
+Breakclone is a package for assessing clonal relationships of tumour pairs based on copy number or mutation data. Further details in [the main vignette](doc/breakclone.html), 
+
 
 ## Example
 
