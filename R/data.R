@@ -10,6 +10,8 @@
 #'   \item{AF}{allele frequency column}
 #'   \item{annotation}{mutation details column}
 #' }
+#' @author Maria Roman Escorza
+#' \email{maria.roman-escorza@@kcl.ac.uk}
 "mutationTable"
 
 #' segmentTable
@@ -26,6 +28,8 @@
 #'   \item{SVType}{type of CNA column. Either DUP for region of elevated copy number relative to the reference or DEL for deletion relative to the reference}
 #'   \item{Length}{lenght of the segment column}
 #' }
+#' @author Maria Roman Escorza
+#' \email{maria.roman-escorza@@kcl.ac.uk}
 "segmentTable"
 
 
@@ -43,6 +47,8 @@
 #'   \item{nMajor}{major copy number }
 #'   \item{nMinor}{minor copy number }
 #' }
+#' @author Maria Roman Escorza
+#' \email{maria.roman-escorza@@kcl.ac.uk}
 "segmentTable_AS"
 
 #' binnedTable
@@ -50,6 +56,8 @@
 #' A matrix of segment mean copy number values per bin or probe x sample
 #'
 #' @format A matrix
+#' @author Maria Roman Escorza
+#' \email{maria.roman-escorza@@kcl.ac.uk}
 "binnedTable"
 
 
@@ -58,4 +66,6 @@
 #' A matrix of relative copy number values per bin or probe x sample
 #'
 #' @format A matrix
+#' @author Maria Roman Escorza
+#' \email{maria.roman-escorza@@kcl.ac.uk}
 "cnTable"

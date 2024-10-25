@@ -126,6 +126,7 @@ calculateMaxGap <- function(segmentTable, cnType){
 #' @param cnType The type of copy number data provided. Currently supported options are a custom allele specific data format, and standard copy number VCF files.
 #' @param excludeChromosomes The name(s) of any chromosomes to be excluded.
 #' @param maxgap The maximum gap between two breakpoints for them to be considered concordant. If unspecified, it is automatically set to 5 times the average interprobe distance of the assay.
+#' @author argymeg
 #' @return A data frame listing the tumour pairs contained in \code{pairs}, their relatedness scores and p-values for relatedness.
 #' @export
 calculateRelatednessCn <- function(segmentTable, pairs, reference = NULL, cnType = c("alleleSpecific", "VCF"), excludeChromosomes = "Y", maxgap = NULL){
@@ -157,6 +158,7 @@ calculateRelatednessCn <- function(segmentTable, pairs, reference = NULL, cnType
 #' @param cnType The type of copy number data provided. Currently supported options are a custom allele specific data format, and standard copy number VCF files.
 #' @param excludeChromosomes The name(s) of any chromosomes to be excluded.
 #' @param maxgap The maximum gap between two breakpoints for them to be considered concordant. If unspecified, it is automatically set to 5 times the average interprobe distance of the assay.
+#' @author argymeg
 #' @return A numeric vector of pair scores comprising the reference distribution.
 #' @export
 makeReferenceCN <- function(segmentTable, pairs, patients = NULL, delimiter = NULL, cnType = c("alleleSpecific", "VCF"), excludeChromosomes = "Y", maxgap = NULL){
@@ -231,6 +233,8 @@ exportSharedBreaks <- function(pair, segmentTable, outdir = '.', cnType = c("all
 #' @param cnType The type of copy number data provided. Currently supported options are a custom allele specific data format, and standard copy number VCF files.
 #' @param maxgap The maximum gap between two breakpoints for them to be considered concordant. If unspecified, it is automatically set to 5 times the average interprobe distance of the assay.
 #' @param save TRUE if want to export the shared mutations.
+#' @author Maria Roman Escorza
+#' \email{maria.roman-escorza@@kcl.ac.uk}
 #' @return List of shared breakpoints per pair It will generate a tsv file per pair in outdir with shared breakpoints. 
 #' @export
 getSharedBreaks <- function(segmentTable, pairs, outdir = '.', cnType = c("alleleSpecific", "VCF"), maxgap=NULL, save = FALSE){
@@ -249,6 +253,8 @@ getSharedBreaks <- function(segmentTable, pairs, outdir = '.', cnType = c("allel
 #' @param thres_related P-value to define related thres_related=0.05 by default.
 #' @param cnType The type of copy number data provided. Currently supported options are a custom allele specific data format, and standard copy number VCF files.
 #' @param maxgap The maximum gap between two breakpoints for them to be considered concordant. If unspecified, it is automatically set to 5 times the average interprobe distance of the assay.
+#' @author Maria Roman Escorza
+#' \email{maria.roman-escorza@@kcl.ac.uk}
 #' @return A data frame listing the clonality results \code{clonalityResults}, clonality verdict based on the thresholds and number and fraction of shared and private breakpoints per sample.
 #' @export
 summarizeClonalityCN <- function(clonalityResults, segmentTable, thres_ambiguous = 0.05, thres_related = 0.01, cnType = c('alleleSpecific', 'VCF'), maxgap = NULL){

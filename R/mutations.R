@@ -80,6 +80,7 @@ getScoreMutations <- function(mutationTable, pair, populationMutations, nAdditio
 #' @param reference A numeric vector of pair scores comprising the reference distribution, generated from the \code{makeReferenceMutations} function. If omitted, p-value calculation will be skipped.
 #' @param excludeChromosomes The name(s) of any chromosomes to be excluded.
 #' @param scaleAFs Scale AFs per-sample by the highest AF within each sample. Only recommended for data with significant normal contamination that you are confident contains at least one clonal mutation per sample.
+#' @author argymeg
 #' @return A data frame listing the tumour pairs contained in \code{pairs}, their relatedness scores and p-values for relatedness.
 #' @export
 calculateRelatednessMutations <- function(mutationTable, pairs, additionalMutations = NULL, nAdditionalSamples = 0, reference = NULL, excludeChromosomes = "chrY", scaleAFs = FALSE){
@@ -108,6 +109,7 @@ calculateRelatednessMutations <- function(mutationTable, pairs, additionalMutati
 #' @param nAdditionalSamples The number of samples used to derive the additional mutations table.
 #' @param excludeChromosomes The name(s) of any chromosomes to be excluded.
 #' @param scaleAFs Scale AFs per-sample by the highest AF within each sample. Only recommended for data with significant normal contamination that you are confident contains at least one clonal mutation per sample.
+#' @author argymeg
 #' @return A numeric vector of pair scores comprising the reference distribution.
 #' @export
 makeReferenceMutations <- function(mutationTable, pairs, patients = NULL, delimiter = NULL, additionalMutations = NULL, nAdditionalSamples = 0, excludeChromosomes = "Y", scaleAFs = FALSE){
@@ -184,7 +186,9 @@ exportSharedMuts <- function(pair, mutationTable, outdir = '.', scaleAFs, save){
 #' @param outdir A path to save the shared mutations If unspecified, it is automatically set to the working directory.
 #' @param scaleAFs Scale AFs per-sample by the highest AF within each sample. Only recommended for data with significant normal contamination that you are confident contains at least one clonal mutation per sample.
 #' @param save TRUE if want to export the shared mutations.
-#' @return List of shared mutations per pair It will generate a tsv file per pair in outdir with shared mutations. 
+#' @return List of shared mutations per pair It will generate a tsv file per pair in outdir with shared mutations. ]
+#' @author Maria Roman Escorza
+#' \email{maria.roman-escorza@@kcl.ac.uk}
 #' @export
 getSharedMuts <- function(mutationTable, pairs, outdir = '.', scaleAFs = FALSE, save = FALSE) {
   res <- apply(pairs, 1, function(x){exportSharedMuts(as.character(x), mutationTable, outdir, scaleAFs, save)})
@@ -199,6 +203,8 @@ getSharedMuts <- function(mutationTable, pairs, outdir = '.', scaleAFs = FALSE, 
 #' @param thres_ambiguous P-value to define ambiguous. thres_ambiguous=0.05 by default.
 #' @param thres_related P-value to define related thres_related=0.05 by default.
 #' @param scaleAFs Scale AFs per-sample by the highest AF within each sample. Only recommended for data with significant normal contamination that you are confident contains at least one clonal mutation per sample.
+#' @author Maria Roman Escorza
+#' \email{maria.roman-escorza@@kcl.ac.uk}
 #' @return A data frame listing the clonality results \code{clonalityResults}, clonality verdict based on the thresholds and number and fraction of shared and private mutations per sample.
 #' @export
 summarizeClonalityMuts <- function(clonalityResults, mutationTable, thres_ambiguous = 0.05, thres_related = 0.01, scaleAFs = FALSE){
