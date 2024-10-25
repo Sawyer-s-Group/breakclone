@@ -1,6 +1,6 @@
 #' mutationTable
 #'
-#' List of mutation in a set of DCIS primaries and recurrences tumours, produced by sequencing. 
+#' List of mutation in a set of DCIS primaries and recurrences tumours, produced by sequencing.
 #'
 #' @format A data table with 5 columns:
 #' \describe{
