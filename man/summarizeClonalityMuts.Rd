@@ -29,3 +29,7 @@ A data frame listing the clonality results \code{clonalityResults}, clonality ve
 \description{
 Summarize clonality results of mutation data.
 }
+\author{
+Maria Roman Escorza
+\email{maria.roman-escorza@kcl.ac.uk}
+}

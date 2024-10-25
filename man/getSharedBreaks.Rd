@@ -32,3 +32,7 @@ List of shared breakpoints per pair It will generate a tsv file per pair in outd
 \description{
 Generate the shared breakpoints per pair calculated by breakclone and used to assess relatedness.
 }
+\author{
+Maria Roman Escorza
+\email{maria.roman-escorza@kcl.ac.uk}
+}

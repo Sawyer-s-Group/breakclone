@@ -20,4 +20,8 @@ mutationTable
 \description{
 List of mutation in a set of DCIS primaries and recurrences tumours, produced by sequencing.
 }
+\author{
+Maria Roman Escorza
+\email{maria.roman-escorza@kcl.ac.uk}
+}
 \keyword{datasets}

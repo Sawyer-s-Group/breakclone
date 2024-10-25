@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 #  
 #  devtools::install_github("Sawyer-s-Group/breakclone")
 
-## -----------------------------------------------------------------------------
+## ----warning=FALSE------------------------------------------------------------
 library(breakclone)
 data(segmentTable_AS)
 data(segmentTable)
@@ -70,7 +70,11 @@ breaks <- getSharedBreaks(segmentTable=segmentTable,
                           save=FALSE)
 breaks[[1]]
 
-## -----------------------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
+#  binnedTable <- log2(Biobase::assayDataElement(QDNAseq_object, "segmented"))
+#  cnTable <- log2(Biobase::assayDataElement(QDNAseq_object, "copynumber"))
+
+## ----message=FALSE, warning=FALSE---------------------------------------------
 data(binnedTable)
 data(cnTable)
 
@@ -85,7 +89,7 @@ plotCNpairVCF(binnedTable,
 reference <- makeReferenceCN(segmentTable=segmentTable_AS, 
                              pairs=pairs_cnAS)
 
-## -----------------------------------------------------------------------------
+## ----message=FALSE, warning=FALSE---------------------------------------------
 results <- calculateRelatednessCn(segmentTable=segmentTable_AS, 
                                   pairs=pairs_cnAS, 
                                   reference=reference)
@@ -94,29 +98,22 @@ summary <- summarizeClonalityCN(clonalityResults=results,
                                 segmentTable=segmentTable_AS)
 head(summary)
 
-## -----------------------------------------------------------------------------
+## ----message=FALSE, warning=FALSE---------------------------------------------
 breaks <- getSharedBreaks(segmentTable=segmentTable_AS, 
                           pairs=pairs_cnAS, 
                           save = FALSE)
-
-## ----eval=FALSE---------------------------------------------------------------
-#  plotCNpairalleleSpecific(ASCATobj=ascat.bc,
-#                           segmentTable=segmentTable_AS,
-#                           pair=c('Patient5_Primary', 'Patient5_Recurrence'),
-#                           breaks,
-#                           build = 'hg19')
 
 ## -----------------------------------------------------------------------------
 data(brca)
 head(brca)
 
-## -----------------------------------------------------------------------------
+## ----warning=FALSE------------------------------------------------------------
 reference <- makeReferenceMutations(mutationTable=mutationTable, 
                                     pairs=pairs_muts, 
                                     additionalMutations=brca, 
                                     nAdditionalSamples=346)
 
-## -----------------------------------------------------------------------------
+## ----warning=FALSE------------------------------------------------------------
 results <- calculateRelatednessMutations(mutationTable=mutationTable, 
                                          pairs=pairs_muts, 
                                          reference=reference, 
@@ -131,16 +128,16 @@ head(summary)
 shared_muts <- getSharedMuts(mutationTable=mutationTable, 
                              pairs=pairs_muts, 
                              save=FALSE)
-shared_muts[[1]]
+shared_muts[[4]]
 
 plotScatterVAF(mutationTable=mutationTable, 
-               pair=c("Patient43_Primary", "Patient43_Recurrence"), 
+               pair=c("Patient46_Primary", "Patient46_Recurrence"), 
                annotGenes=TRUE)
 
 ## -----------------------------------------------------------------------------
 plotScoresDensity(reference, results)
 
-## -----------------------------------------------------------------------------
+## ----warning=FALSE------------------------------------------------------------
 plotScoresHistogram(reference, results)
 
 ## ----message=FALSE------------------------------------------------------------

@@ -17,3 +17,6 @@ A data.table with column names SampleID, Chr, Pos, AF.
 \description{
 Read in mutation from standard VCF files
 }
+\author{
+argymeg
+}

@@ -38,3 +38,6 @@ A numeric vector of pair scores comprising the reference distribution.
 \description{
 Generates the reference distribution of concordance scores from unpaired tumours for a given dataset.
 }
+\author{
+argymeg
+}

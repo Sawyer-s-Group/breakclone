@@ -1,7 +1,7 @@
 ---
 title: "breakclone: Estimating clonal relatedness probability between tumour pairs"
-author: "Vignette Author"
-date: "2024-10-24"
+author: "Maria Roman Escorza (maria.roman-escorza@kcl.ac.uk)"
+date: "2024-10-25"
 output: 
   html_document:
     toc: true
@@ -71,7 +71,7 @@ Minimal inputs for running brekclone are:
 
 - Aberrations `data.table`  (called `segmentTable` in copy number functions and `mutationTable`).
 - paired IDs `data.table` (`pairs`). 
-plotCNpairVCF
+
 ## `segmentaTable` input for non-allele-specific data 
 
 `readVCFCn` automatically reads copy number data from standard VCF files. 
@@ -144,7 +144,7 @@ head(mutationTable)
 #> 6: Patient38_Primary      3 179218303 0.6518     PIK3CA
 ```
 
-## `pairs` input
+## `pairs` input
 
 `pairs` is a table of paired samples from the dataset. All tumours present in this table will be paired with all tumours from other patients. IIf sample IDs comprise a patient ID and a tumour type identifier, `inferPairs` can attempt to infer the tumour pairs from the cohort. 
 
@@ -192,20 +192,20 @@ summary <- summarizeClonalityCN(clonalityResults=results,
                                 cnType='VCF')
 
 head(summary)
-#>             Sample1              Sample2 pair_scores    pair_ps verdict shared private_sample1 private_sample2 total
-#> 1 Patient53_Primary Patient53_Recurrence   0.5329502 0.00000000 Related     56              18              44   118
-#> 2 Patient59_Primary Patient59_Recurrence   0.6794118 0.00000000 Related     30               2               6    38
-#> 3 Patient47_Primary Patient47_Recurrence   0.2107527 0.00000000 Related      9               9              35    53
-#> 4 Patient49_Primary Patient49_Recurrence   0.1289377 0.00952381 Related     15              93              59   167
-#> 5 Patient52_Primary Patient52_Recurrence   0.5680412 0.00000000 Related     69              23              33   125
-#> 6 Patient57_Primary Patient57_Recurrence   0.5182456 0.00000000 Related     60              18              52   130
-#>   fraction_private_sample1 fraction_private_sample2 fraction_shared
-#> 1               0.15254237                0.3728814      0.47457627
-#> 2               0.05263158                0.1578947      0.78947368
-#> 3               0.16981132                0.6603774      0.16981132
-#> 4               0.55688623                0.3532934      0.08982036
-#> 5               0.18400000                0.2640000      0.55200000
-#> 6               0.13846154                0.4000000      0.46153846
+#>             Sample1              Sample2 pair_scores    pair_ps verdict shared private_sample1 private_sample2 total fraction_private_sample1
+#> 1 Patient53_Primary Patient53_Recurrence   0.5329502 0.00000000 Related     56              18              44   118               0.15254237
+#> 2 Patient59_Primary Patient59_Recurrence   0.6794118 0.00000000 Related     30               2               6    38               0.05263158
+#> 3 Patient47_Primary Patient47_Recurrence   0.2107527 0.00000000 Related      9               9              35    53               0.16981132
+#> 4 Patient49_Primary Patient49_Recurrence   0.1289377 0.00952381 Related     15              93              59   167               0.55688623
+#> 5 Patient52_Primary Patient52_Recurrence   0.5680412 0.00000000 Related     69              23              33   125               0.18400000
+#> 6 Patient57_Primary Patient57_Recurrence   0.5182456 0.00000000 Related     60              18              52   130               0.13846154
+#>   fraction_private_sample2 fraction_shared
+#> 1                0.3728814      0.47457627
+#> 2                0.1578947      0.78947368
+#> 3                0.6603774      0.16981132
+#> 4                0.3532934      0.08982036
+#> 5                0.2640000      0.55200000
+#> 6                0.4000000      0.46153846
 ```
 
 The algorithm uses the position of the individual copy number aberration breakpoints. Concordant breakpoints can be exported using `getSharedBreaks`. Output is a list of tables including he shared breakpoints per sample.
@@ -276,7 +276,14 @@ breaks[[1]]
 #> DEL.101       17    600001  55100000          end
 ```
 
-Paired copy number profiles with shared CNAs and breakpoints can be visualized using `plotCNpairVCF`. Input is binned copy number data where  `cnTable` represents the copy number values and `binnedTable` represents the segment mean of the copy number values.
+Paired copy number profiles with shared CNAs and breakpoints can be visualized using `plotCNpairVCF`. Input is binned copy number data where  `cnTable` represents the copy number values and `binnedTable` represents the segment mean of the copy number values, which can be extracted easily from a segmented `QDNAseq` object using the code below.
+
+
+``` r
+binnedTable <- log2(Biobase::assayDataElement(QDNAseq_object, "segmented")) 
+cnTable <- log2(Biobase::assayDataElement(QDNAseq_object, "copynumber"))
+```
+
 
 
 ``` r
@@ -289,13 +296,9 @@ plotCNpairVCF(binnedTable,
               segmentTable=segmentTable, 
               breaks=breaks, 
               build='hg38')
-#> Warning: Removed 30 rows containing missing values or values outside the scale range (`geom_point()`).
-#> Warning: Removed 16 rows containing missing values or values outside the scale range (`geom_point()`).
-#> Warning: Removed 25 rows containing missing values or values outside the scale range (`geom_point()`).
-#> Warning: Removed 16 rows containing missing values or values outside the scale range (`geom_point()`).
 ```
 
-![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png)
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png)
 
 # Clonality assessment using allele-specific copy number  
 
@@ -314,20 +317,20 @@ results <- calculateRelatednessCn(segmentTable=segmentTable_AS,
 summary <- summarizeClonalityCN(clonalityResults=results, 
                                 segmentTable=segmentTable_AS)
 head(summary)
-#>             Sample1              Sample2 pair_scores     pair_ps   verdict shared private_sample1 private_sample2
-#> 1  Patient5_Primary  Patient5_Recurrence 0.100451322 0.002214839   Related     39             201             381
-#> 2  Patient6_Primary  Patient6_Recurrence 0.122202861 0.000000000   Related     44             120             256
-#> 3  Patient7_Primary  Patient7_Recurrence 0.057059961 0.045957918 Ambiguous     27             261             191
-#> 4  Patient8_Primary  Patient8_Recurrence 0.005728314 0.607419712 Unrelated      1             143              63
-#> 5  Patient9_Primary  Patient9_Recurrence 0.011206362 0.403100775 Unrelated      7              91             307
-#> 6 Patient10_Primary Patient10_Recurrence 0.093818405 0.002768549   Related     29             255             173
-#>   total fraction_private_sample1 fraction_private_sample2 fraction_shared
-#> 1   621                0.3236715                0.6135266     0.062801932
-#> 2   420                0.2857143                0.6095238     0.104761905
-#> 3   479                0.5448852                0.3987474     0.056367432
-#> 4   207                0.6908213                0.3043478     0.004830918
-#> 5   405                0.2246914                0.7580247     0.017283951
-#> 6   457                0.5579869                0.3785558     0.063457330
+#>             Sample1              Sample2 pair_scores     pair_ps   verdict shared private_sample1 private_sample2 total fraction_private_sample1
+#> 1  Patient5_Primary  Patient5_Recurrence 0.100451322 0.002214839   Related     39             201             381   621                0.3236715
+#> 2  Patient6_Primary  Patient6_Recurrence 0.122202861 0.000000000   Related     44             120             256   420                0.2857143
+#> 3  Patient7_Primary  Patient7_Recurrence 0.057059961 0.045957918 Ambiguous     27             261             191   479                0.5448852
+#> 4  Patient8_Primary  Patient8_Recurrence 0.005728314 0.607419712 Unrelated      1             143              63   207                0.6908213
+#> 5  Patient9_Primary  Patient9_Recurrence 0.011206362 0.403100775 Unrelated      7              91             307   405                0.2246914
+#> 6 Patient10_Primary Patient10_Recurrence 0.093818405 0.002768549   Related     29             255             173   457                0.5579869
+#>   fraction_private_sample2 fraction_shared
+#> 1                0.6135266     0.062801932
+#> 2                0.6095238     0.104761905
+#> 3                0.3987474     0.056367432
+#> 4                0.3043478     0.004830918
+#> 5                0.7580247     0.017283951
+#> 6                0.3785558     0.063457330
 ```
 
 
@@ -381,20 +384,20 @@ results <- calculateRelatednessMutations(mutationTable=mutationTable,
 summary <- summarizeClonalityMuts(clonalityResults=results,
                                   mutationTable=mutationTable)
 head(summary)
-#>             Sample1              Sample2 pair_scores     pair_ps   verdict shared private_sample1 private_sample2
-#> 1 Patient43_Primary Patient43_Recurrence   0.0000000 1.000000000 Unrelated      0               1               1
-#> 2 Patient35_Primary Patient35_Recurrence   1.0000000 0.007549361   Related      1               0               0
-#> 3 Patient47_Primary Patient47_Recurrence   0.4312269 0.037746806 Ambiguous      2               1               1
-#> 4 Patient46_Primary Patient46_Recurrence   0.9343813 0.013937282 Ambiguous      5               1               0
-#> 5 Patient32_Primary Patient32_Recurrence   1.0000000 0.007549361   Related      2               0               0
-#> 6 Patient38_Primary Patient38_Recurrence   1.0000000 0.007549361   Related      1               0               0
-#>   total fraction_private_sample1 fraction_private_sample2 fraction_shared
-#> 1     2                0.5000000                     0.50       0.0000000
-#> 2     1                0.0000000                     0.00       1.0000000
-#> 3     4                0.2500000                     0.25       0.5000000
-#> 4     6                0.1666667                     0.00       0.8333333
-#> 5     2                0.0000000                     0.00       1.0000000
-#> 6     1                0.0000000                     0.00       1.0000000
+#>             Sample1              Sample2 pair_scores     pair_ps   verdict shared private_sample1 private_sample2 total fraction_private_sample1
+#> 1 Patient43_Primary Patient43_Recurrence   0.0000000 1.000000000 Unrelated      0               1               1     2                0.5000000
+#> 2 Patient35_Primary Patient35_Recurrence   1.0000000 0.007549361   Related      1               0               0     1                0.0000000
+#> 3 Patient47_Primary Patient47_Recurrence   0.4312269 0.037746806 Ambiguous      2               1               1     4                0.2500000
+#> 4 Patient46_Primary Patient46_Recurrence   0.9343813 0.013937282 Ambiguous      5               1               0     6                0.1666667
+#> 5 Patient32_Primary Patient32_Recurrence   1.0000000 0.007549361   Related      2               0               0     2                0.0000000
+#> 6 Patient38_Primary Patient38_Recurrence   1.0000000 0.007549361   Related      1               0               0     1                0.0000000
+#>   fraction_private_sample2 fraction_shared
+#> 1                     0.50       0.0000000
+#> 2                     0.00       1.0000000
+#> 3                     0.25       0.5000000
+#> 4                     0.00       0.8333333
+#> 5                     0.00       1.0000000
+#> 6                     0.00       1.0000000
 ```
 
 Shared mutations can be exported using `getSharedMuts` and plotted with `plotScatterVAF`. Mutations can be labelled by extra column in `mutationTable` if `annotGenes=TRUE`.
@@ -417,7 +420,7 @@ plotScatterVAF(mutationTable=mutationTable,
                annotGenes=TRUE)
 ```
 
-![plot of chunk unnamed-chunk-20](figure/unnamed-chunk-20-1.png)
+![plot of chunk unnamed-chunk-21](figure/unnamed-chunk-21-1.png)
 
 
 # Assessement of the clonality score
@@ -429,14 +432,14 @@ plotScatterVAF(mutationTable=mutationTable,
 plotScoresDensity(reference, results)
 ```
 
-![plot of chunk unnamed-chunk-21](figure/unnamed-chunk-21-1.png)
+![plot of chunk unnamed-chunk-22](figure/unnamed-chunk-22-1.png)
 
 
 ``` r
 plotScoresHistogram(reference, results)
 ```
 
-![plot of chunk unnamed-chunk-22](figure/unnamed-chunk-22-1.png)
+![plot of chunk unnamed-chunk-23](figure/unnamed-chunk-23-1.png)
 
 # Plot clonality results
 
@@ -451,11 +454,11 @@ plotSummary(summary,
             )
 ```
 
-![plot of chunk unnamed-chunk-23](figure/unnamed-chunk-23-1.png)
+![plot of chunk unnamed-chunk-24](figure/unnamed-chunk-24-1.png)
 
-# Apendix: Download mutations from TCGA 
+# Appendix: Download mutations from TCGA 
 
-This section shows how to create additionalMutations, a table of mutations to be taken into account when calculating population frequencies. At a minimum, a table of the mutations in the population being studied. This is more informative when tumour type-specific mutations are included from external sources (e.g. TCGA).
+This section shows how to create `additionalMutations`, a table of mutations to be taken into account when calculating population frequencies. At a minimum, a table of the mutations in the population being studied. This is more informative when tumour type-specific mutations are included from external sources (e.g. TCGA).
 
 
 ``` r
@@ -514,59 +517,49 @@ sessionInfo()
 #> [1] stats4    stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#>  [1] breakclone_0.3.3                        liftOver_1.22.0                        
-#>  [3] Homo.sapiens_1.3.1                      TxDb.Hsapiens.UCSC.hg19.knownGene_3.2.2
-#>  [5] org.Hs.eg.db_3.16.0                     GO.db_3.16.0                           
-#>  [7] OrganismDbi_1.40.0                      GenomicFeatures_1.50.4                 
-#>  [9] AnnotationDbi_1.60.2                    Biobase_2.58.0                         
-#> [11] rtracklayer_1.58.0                      gwascat_2.30.0                         
-#> [13] GenomicRanges_1.50.2                    TCGAretriever_1.9.1                    
-#> [15] biomaRt_2.54.1                          GenomeInfoDb_1.34.9                    
-#> [17] IRanges_2.32.0                          S4Vectors_0.36.2                       
-#> [19] BiocGenerics_0.44.0                    
+#>  [1] rSEA_2.1.2                              ggplot2_3.5.1                           hommel_1.6                             
+#>  [4] breakclone_0.3.3                        liftOver_1.22.0                         Homo.sapiens_1.3.1                     
+#>  [7] TxDb.Hsapiens.UCSC.hg19.knownGene_3.2.2 org.Hs.eg.db_3.16.0                     GO.db_3.16.0                           
+#> [10] OrganismDbi_1.40.0                      GenomicFeatures_1.50.4                  AnnotationDbi_1.60.2                   
+#> [13] Biobase_2.58.0                          rtracklayer_1.58.0                      gwascat_2.30.0                         
+#> [16] GenomicRanges_1.50.2                    TCGAretriever_1.9.1                     biomaRt_2.54.1                         
+#> [19] GenomeInfoDb_1.34.9                     IRanges_2.32.0                          S4Vectors_0.36.2                       
+#> [22] BiocGenerics_0.44.0                    
 #> 
 #> loaded via a namespace (and not attached):
-#>   [1] utf8_1.2.4                  R.utils_2.12.3              tidyselect_1.2.1            RSQLite_2.3.7              
-#>   [5] htmlwidgets_1.6.4           grid_4.2.3                  BiocParallel_1.32.6         devtools_2.4.5             
-#>   [9] munsell_0.5.1               codetools_0.2-19            miniUI_0.1.1.1              withr_3.0.1                
-#>  [13] colorspace_2.1-0            filelock_1.0.3              highr_0.11                  knitr_1.48                 
-#>  [17] rstudioapi_0.16.0           ggsignif_0.6.4              labeling_0.4.3              MatrixGenerics_1.10.0      
-#>  [21] GenomeInfoDbData_1.2.9      farver_2.1.2                bit64_4.0.5                 rprojroot_2.0.4            
-#>  [25] vctrs_0.6.5                 generics_0.1.3              xfun_0.47                   BiocFileCache_2.6.1        
-#>  [29] markdown_1.12               R6_2.5.1                    doParallel_1.0.17           ggbeeswarm_0.7.2           
-#>  [33] clue_0.3-65                 bitops_1.0-7                cachem_1.1.0                DelayedArray_0.24.0        
-#>  [37] promises_1.3.0              BiocIO_1.8.0                scales_1.3.0                pinfsc50_1.3.0             
-#>  [41] beeswarm_0.4.0              gtable_0.3.5                Cairo_1.6-2                 processx_3.8.4             
-#>  [45] rlang_1.1.4                 GlobalOptions_0.1.2         splines_4.2.3               rstatix_0.7.2              
-#>  [49] broom_1.0.6                 BiocManager_1.30.23         yaml_2.3.10                 reshape2_1.4.4             
-#>  [53] abind_1.4-5                 snpStats_1.48.0             backports_1.5.0             httpuv_1.6.15              
-#>  [57] gridtext_0.1.5              RBGL_1.74.0                 tools_4.2.3                 usethis_2.2.3              
-#>  [61] ggplot2_3.5.1               ellipsis_0.3.2              RColorBrewer_1.1-3          sessioninfo_1.2.2          
-#>  [65] Rcpp_1.0.12                 plyr_1.8.9                  progress_1.2.3              zlibbioc_1.44.0            
-#>  [69] purrr_1.0.2                 RCurl_1.98-1.14             ps_1.7.6                    prettyunits_1.2.0          
-#>  [73] ggpubr_0.6.0                GetoptLong_1.0.5            cowplot_1.1.3               urlchecker_1.0.1           
-#>  [77] SummarizedExperiment_1.28.0 cluster_2.1.4               fs_1.6.4                    magrittr_2.0.3             
-#>  [81] data.table_1.15.4           circlize_0.4.16             matrixStats_1.3.0           pkgload_1.3.4              
-#>  [85] hms_1.1.3                   mime_0.12                   evaluate_1.0.0              xtable_1.8-4               
-#>  [89] XML_3.99-0.16.1             shape_1.4.6.1               vcfR_1.15.0                 testthat_3.2.1.1           
-#>  [93] compiler_4.2.3              tibble_3.2.1                crayon_1.5.3                R.oo_1.26.0                
-#>  [97] htmltools_0.5.8.1           mgcv_1.8-42                 later_1.3.2                 tzdb_0.4.0                 
-#> [101] tidyr_1.3.1                 DBI_1.2.3                   dbplyr_2.5.0                ComplexHeatmap_2.14.0      
-#> [105] MASS_7.3-58.2               rappdirs_0.3.3              Matrix_1.6-5                car_3.1-2                  
-#> [109] readr_2.1.5                 permute_0.9-7               brio_1.1.5                  cli_3.6.3                  
-#> [113] R.methodsS3_1.8.2           parallel_4.2.3              pkgconfig_2.0.3             GenomicAlignments_1.34.1   
-#> [117] xml2_1.3.6                  roxygen2_7.3.1              foreach_1.5.2               vipor_0.4.7                
-#> [121] XVector_0.38.0              stringr_1.5.1               VariantAnnotation_1.44.1    callr_3.7.6                
-#> [125] digest_0.6.37               graph_1.76.0                vegan_2.6-6.1               Biostrings_2.66.0          
-#> [129] rmarkdown_2.28              restfulr_0.0.15             curl_5.2.1                  commonmark_1.9.1           
-#> [133] shiny_1.8.1.1               Rsamtools_2.14.0            rjson_0.2.21                lifecycle_1.0.4            
-#> [137] nlme_3.1-162                jsonlite_1.8.9              carData_3.0-5               desc_1.4.3                 
-#> [141] viridisLite_0.4.2           BSgenome_1.66.3             fansi_1.0.6                 pillar_1.9.0               
-#> [145] lattice_0.20-45             survival_3.6-4              ggrastr_1.0.2               KEGGREST_1.38.0            
-#> [149] fastmap_1.2.0               httr_1.4.7                  pkgbuild_1.4.4              glue_1.7.0                 
-#> [153] remotes_2.5.0               png_0.1-8                   iterators_1.0.14            bit_4.0.5                  
-#> [157] stringi_1.8.4               profvis_0.3.8               blob_1.2.4                  memoise_2.0.1              
-#> [161] dplyr_1.1.4                 ape_5.8
+#>   [1] utf8_1.2.4                  R.utils_2.12.3              tidyselect_1.2.1            RSQLite_2.3.7               htmlwidgets_1.6.4          
+#>   [6] grid_4.2.3                  BiocParallel_1.32.6         devtools_2.4.5              munsell_0.5.1               codetools_0.2-19           
+#>  [11] miniUI_0.1.1.1              withr_3.0.1                 colorspace_2.1-0            filelock_1.0.3              highr_0.11                 
+#>  [16] knitr_1.48                  rstudioapi_0.16.0           ggsignif_0.6.4              labeling_0.4.3              MatrixGenerics_1.10.0      
+#>  [21] GenomeInfoDbData_1.2.9      farver_2.1.2                bit64_4.0.5                 rprojroot_2.0.4             vctrs_0.6.5                
+#>  [26] generics_0.1.3              xfun_0.47                   BiocFileCache_2.6.1         markdown_1.12               R6_2.5.1                   
+#>  [31] doParallel_1.0.17           ggbeeswarm_0.7.2            clue_0.3-65                 bitops_1.0-7                cachem_1.1.0               
+#>  [36] DelayedArray_0.24.0         promises_1.3.0              BiocIO_1.8.0                scales_1.3.0                pinfsc50_1.3.0             
+#>  [41] beeswarm_0.4.0              gtable_0.3.5                Cairo_1.6-2                 processx_3.8.4              rlang_1.1.4                
+#>  [46] GlobalOptions_0.1.2         splines_4.2.3               rstatix_0.7.2               broom_1.0.6                 BiocManager_1.30.23        
+#>  [51] yaml_2.3.10                 reshape2_1.4.4              abind_1.4-5                 snpStats_1.48.0             backports_1.5.0            
+#>  [56] httpuv_1.6.15               gridtext_0.1.5              RBGL_1.74.0                 tools_4.2.3                 usethis_2.2.3              
+#>  [61] ellipsis_0.3.2              RColorBrewer_1.1-3          sessioninfo_1.2.2           Rcpp_1.0.12                 plyr_1.8.9                 
+#>  [66] progress_1.2.3              zlibbioc_1.44.0             purrr_1.0.2                 RCurl_1.98-1.14             ps_1.7.6                   
+#>  [71] prettyunits_1.2.0           ggpubr_0.6.0                GetoptLong_1.0.5            cowplot_1.1.3               urlchecker_1.0.1           
+#>  [76] SummarizedExperiment_1.28.0 cluster_2.1.4               fs_1.6.4                    magrittr_2.0.3              data.table_1.15.4          
+#>  [81] circlize_0.4.16             matrixStats_1.3.0           pkgload_1.3.4               hms_1.1.3                   mime_0.12                  
+#>  [86] evaluate_1.0.0              xtable_1.8-4                XML_3.99-0.16.1             shape_1.4.6.1               vcfR_1.15.0                
+#>  [91] testthat_3.2.1.1            compiler_4.2.3              tibble_3.2.1                crayon_1.5.3                R.oo_1.26.0                
+#>  [96] htmltools_0.5.8.1           mgcv_1.8-42                 later_1.3.2                 tzdb_0.4.0                  tidyr_1.3.1                
+#> [101] DBI_1.2.3                   dbplyr_2.5.0                ComplexHeatmap_2.14.0       MASS_7.3-58.2               rappdirs_0.3.3             
+#> [106] Matrix_1.6-5                car_3.1-2                   readr_2.1.5                 permute_0.9-7               brio_1.1.5                 
+#> [111] cli_3.6.3                   R.methodsS3_1.8.2           parallel_4.2.3              pkgconfig_2.0.3             GenomicAlignments_1.34.1   
+#> [116] xml2_1.3.6                  roxygen2_7.3.1              foreach_1.5.2               vipor_0.4.7                 XVector_0.38.0             
+#> [121] stringr_1.5.1               VariantAnnotation_1.44.1    callr_3.7.6                 digest_0.6.37               graph_1.76.0               
+#> [126] vegan_2.6-6.1               Biostrings_2.66.0           rmarkdown_2.28              restfulr_0.0.15             curl_5.2.1                 
+#> [131] commonmark_1.9.1            shiny_1.8.1.1               Rsamtools_2.14.0            rjson_0.2.21                lifecycle_1.0.4            
+#> [136] nlme_3.1-162                jsonlite_1.8.9              carData_3.0-5               desc_1.4.3                  viridisLite_0.4.2          
+#> [141] BSgenome_1.66.3             fansi_1.0.6                 pillar_1.9.0                lattice_0.20-45             survival_3.6-4             
+#> [146] ggrastr_1.0.2               KEGGREST_1.38.0             fastmap_1.2.0               httr_1.4.7                  pkgbuild_1.4.4             
+#> [151] glue_1.7.0                  remotes_2.5.0               png_0.1-8                   iterators_1.0.14            bit_4.0.5                  
+#> [156] stringi_1.8.4               profvis_0.3.8               blob_1.2.4                  memoise_2.0.1               dplyr_1.1.4                
+#> [161] ape_5.8
 ```
 
 # References

@@ -22,4 +22,8 @@ segmentTable
 \description{
 Copy number aberrations in a set of DCIS primaries and recurrences tumours, produced by low-coverage Whole Genome Sequencing.
 }
+\author{
+Maria Roman Escorza
+\email{maria.roman-escorza@kcl.ac.uk}
+}
 \keyword{datasets}

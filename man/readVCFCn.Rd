@@ -17,3 +17,6 @@ A data.table with column names SampleID, Chr, Start, End, Bins, SVType, Length.
 \description{
 Read in copy number data from standard VCF files
 }
+\author{
+argymeg
+}

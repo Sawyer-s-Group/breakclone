@@ -49,3 +49,7 @@ Mutation plot.
 \description{
 VAF scatter plot for mutations in a pair.
 }
+\author{
+Maria Roman Escorza
+\email{maria.roman-escorza@kcl.ac.uk}
+}

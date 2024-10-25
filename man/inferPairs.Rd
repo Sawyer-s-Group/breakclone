@@ -17,3 +17,6 @@ A data.frame with column names Sample1 and Sample2
 \description{
 If sample IDs comprise a patient ID and a tumour type identifier, this function can attempt to infer the tumour pairs from the cohort.
 }
+\author{
+argymeg
+}

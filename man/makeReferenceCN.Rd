@@ -39,3 +39,6 @@ Generates the reference distribution of concordance scores from unpaired tumours
 The default is to assume one tumour pair per patient. If the sample is found in more than one pair, indicating more than one pair per patient, an error will be thrown.
 In that case you must specify either \code{patients} or \code{delimiter}.
 }
+\author{
+argymeg
+}

@@ -32,3 +32,6 @@ A data frame listing the tumour pairs contained in \code{pairs}, their relatedne
 \description{
 Calculates the relatedness scores and (optionally) p-values for paired tumours from copy number data
 }
+\author{
+argymeg
+}

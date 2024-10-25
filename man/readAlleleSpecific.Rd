@@ -45,3 +45,6 @@ A data.table with column names SampleID, Chr, Start, End, nProbes, nMajor, nMino
 Read in allele-specific copy number data from tab- or comma- separated files. Required fields in each file are the chromosome name, start and end coordinates,
 the number of probes in each segment, the minor copy number and either the major or total copy number.
 }
+\author{
+argymeg
+}

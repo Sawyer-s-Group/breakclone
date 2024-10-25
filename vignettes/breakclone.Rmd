@@ -1,6 +1,6 @@
 ---
 title: "breakclone: Estimating clonal relatedness probability between tumour pairs"
-author: "Vignette Author"
+author: "Maria Roman Escorza (maria.roman-escorza@kcl.ac.uk)"
 date: "`r Sys.Date()`"
 output: 
   html_document:
@@ -68,13 +68,13 @@ data(mutationTable)
 
 # Preparing input data
 
-`breakclone` takes advantage of fast `data.table` objects, an extension of `data.frame` objects which allows fast aggregation of large data. If you prefer to use alternative methods to read your data than the proposed by the package, please make sure you transform it to the appropiate formate using `data.table::as.data.table()`.
+`breakclone` takes advantage of fast `data.table`, an extension of `data.frame` which allows fast aggregation of large data. If you prefer to use alternative methods to read your data than the proposed by the package, please make sure you transform it to the appropiate formate using `data.table::as.data.table()`.
 
 Minimal inputs for running brekclone are:
 
 - Aberrations `data.table`  (called `segmentTable` in copy number functions and `mutationTable`).
 - paired IDs `data.table` (`pairs`). 
-plotCNpairVCF
+
 ## `segmentaTable` input for non-allele-specific data 
 
 `readVCFCn` automatically reads copy number data from standard VCF files. 
@@ -114,7 +114,7 @@ class(mutationTable)
 head(mutationTable)
 ```
 
-## `pairs` input
+## `pairs` input
 
 `pairs` is a table of paired samples from the dataset. All tumours present in this table will be paired with all tumours from other patients. IIf sample IDs comprise a patient ID and a tumour type identifier, `inferPairs` can attempt to infer the tumour pairs from the cohort. 
 
@@ -163,9 +163,15 @@ breaks <- getSharedBreaks(segmentTable=segmentTable,
 breaks[[1]]
 ```
 
-Paired copy number profiles with shared CNAs and breakpoints can be visualized using `plotCNpairVCF`. Input is binned copy number data where  `cnTable` represents the copy number values and `binnedTable` represents the segment mean of the copy number values.
+Paired copy number profiles with shared CNAs and breakpoints can be visualized using `plotCNpairVCF`. Input is binned copy number data where  `cnTable` represents the copy number values and `binnedTable` represents the segment mean of the copy number values, which can be extracted easily from a segmented `QDNAseq` object using the code below.
 
-```{r, message=FALSE}
+```{r, eval=FALSE}
+binnedTable <- log2(Biobase::assayDataElement(QDNAseq_object, "segmented")) 
+cnTable <- log2(Biobase::assayDataElement(QDNAseq_object, "copynumber"))
+```
+
+
+```{r, message=FALSE, warning=FALSE}
 data(binnedTable)
 data(cnTable)
 
@@ -269,9 +275,9 @@ plotSummary(summary,
             )
 ```
 
-# Apendix: Download mutations from TCGA 
+# Appendix: Download mutations from TCGA 
 
-This section shows how to create additionalMutations, a table of mutations to be taken into account when calculating population frequencies. At a minimum, a table of the mutations in the population being studied. This is more informative when tumour type-specific mutations are included from external sources (e.g. TCGA).
+This section shows how to create `additionalMutations`, a table of mutations to be taken into account when calculating population frequencies. At a minimum, a table of the mutations in the population being studied. This is more informative when tumour type-specific mutations are included from external sources (e.g. TCGA).
 
 ```{r}
 library(TCGAretriever)

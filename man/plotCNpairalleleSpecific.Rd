@@ -47,3 +47,7 @@ Copy number plot.
 \description{
 Plot a alleleSpecific copy number pair with breakpoints.
 }
+\author{
+Maria Roman Escorza
+\email{maria.roman-escorza@kcl.ac.uk}
+}

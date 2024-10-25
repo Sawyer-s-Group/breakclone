@@ -14,3 +14,6 @@ plotScoresDensity(reference, results)
 \description{
 Plot the reference and pair distributions.
 }
+\author{
+argymeg
+}

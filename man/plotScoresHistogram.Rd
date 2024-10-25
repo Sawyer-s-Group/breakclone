@@ -14,3 +14,6 @@ plotScoresHistogram(reference, results)
 \description{
 Plot the reference and pair histograms.
 }
+\author{
+argymeg
+}

@@ -50,3 +50,7 @@ Summary plot.
 \description{
 Plot stacked barplot of total, shared and non-shared breakpoints/mutations and breakclone score per sample.
 }
+\author{
+Maria Roman Escorza
+\email{maria.roman-escorza@kcl.ac.uk}
+}

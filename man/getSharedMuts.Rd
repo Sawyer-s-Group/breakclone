@@ -24,8 +24,12 @@ getSharedMuts(
 \item{save}{TRUE if want to export the shared mutations.}
 }
 \value{
-List of shared mutations per pair It will generate a tsv file per pair in outdir with shared mutations.
+List of shared mutations per pair It will generate a tsv file per pair in outdir with shared mutations. ]
 }
 \description{
 Get common mutations
+}
+\author{
+Maria Roman Escorza
+\email{maria.roman-escorza@kcl.ac.uk}
 }

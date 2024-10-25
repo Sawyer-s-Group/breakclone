@@ -13,4 +13,8 @@ cnTable
 \description{
 A matrix of relative copy number values per bin or probe x sample
 }
+\author{
+Maria Roman Escorza
+\email{maria.roman-escorza@kcl.ac.uk}
+}
 \keyword{datasets}
