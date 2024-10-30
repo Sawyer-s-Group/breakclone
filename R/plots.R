@@ -309,7 +309,7 @@ plotCNpairVCF <- function(binnedTable, cnTable, pair, segmentTable, breaks = NUL
                         segmentTable, 
                         callMat, 
                         templateGR, 
-                        cnType, 
+                        cnType = 'VCF', 
                         maxgap, 
                         excludeChromosomes, 
                         sharedBarSize)
@@ -419,7 +419,7 @@ plotCNpairalleleSpecific <- function(ASCATobj, segmentTable, pair, breaks = NULL
                         segmentTable, 
                         callMat, 
                         templateGR,
-                        cnType, 
+                        cnType = 'alleleSpecific', 
                         maxgap, 
                         excludeChromosomes, 
                         sharedBarSize)
