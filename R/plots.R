@@ -228,6 +228,10 @@ buildtmpGR <- function(template, segmentTable, pair) {
 
 buildbrkMat <- function(breaks, pair, segmentTable, callMat, templateGR, cnType = c("alleleSpecific", "VCF"), maxgap, excludeChromosomes = 'Y', sharedBarSize = 30) {
   if (is.null(breaks)) {
+    if (is.null(maxgap)) {
+      maxgap <- calculateMaxGap(segmentTable, cnType)
+    }
+
     brk <- exportSharedBreaks(pair,
                               segmentTable,
                               cnType = cnType,
@@ -236,6 +240,8 @@ buildbrkMat <- function(breaks, pair, segmentTable, callMat, templateGR, cnType 
   } else {
     brk <- as.data.table(breaks[[paste0(pair[1], "-", pair[2])]])
   }
+
+  brk <- as.data.table(brk)
 
   if (!isFALSE(excludeChromosomes)){
     brk <- brk[!excludeChromosomes, on = "seqnames"]
@@ -308,15 +314,15 @@ plotCNpairVCF <- function(binnedTable, cnTable, pair, segmentTable, breaks = NUL
   colorsCN <- structure(c("#b2182b", "#2166ac"), names = c("DUP", "DEL"))
 
   # build brkMat
-  brkMat <- buildbrkMat(breaks,
-                        pair,
-                        segmentTable,
-                        callMat,
-                        templateGR,
+  brkMat <- buildbrkMat(breaks = breaks,
+                        pair = pair,
+                        segmentTable = segmentTable,
+                        callMat = callMat,
+                        templateGR = templateGR,
                         cnType = 'VCF',
-                        maxgap,
-                        excludeChromosomes,
-                        sharedBarSize)
+                        maxgap = maxgap,
+                        excludeChromosomes = excludeChromosomes,
+                        sharedBarSize = sharedBarSize)
 
   # segmented plot
   p1 <- plotCN(tmp = template,
