@@ -24,8 +24,8 @@ plotScoresDensity <- function(reference, results) {
     scale_colour_brewer(palette = "Set1") +
     geom_hline(yintercept = 0, size = 1) +
     geom_vline(xintercept = 0, size = 1) +
-    geom_vline(xintercept = quantile(reference, probs = 0.95), 
-               size = 0.5, 
+    geom_vline(xintercept = quantile(reference, probs = 0.95),
+               size = 0.5,
                linetype = 2) +
     ylab("Density")
   return(plot)
@@ -49,8 +49,8 @@ plotScoresHistogram <- function(reference, results) {
     scale_color_brewer(palette = "Set1") +
     geom_hline(yintercept = 0, size = 1) +
     geom_vline(xintercept = 0, size = 1) +
-    scale_x_continuous(limits = c(-0.1, 1.1), 
-                       breaks = seq(0, 1, 0.1), 
+    scale_x_continuous(limits = c(-0.1, 1.1),
+                       breaks = seq(0, 1, 0.1),
                        expand = expand_scale()) +
     ylab("Density")
   return(plot)
@@ -69,50 +69,50 @@ plotCN <- function(tmp, limits, color, chrLims = NULL, bincytoend = NULL, cnColu
   colnames(tmp)[colnames(tmp) == segColumn] <- "segColumn"
 
   p <- ggplot() +
-    scale_y_continuous(name = yaxis, 
-                       limits = c(limits[1], limits[2]), 
-                       breaks = seq(limits[1], limits[2], 0.5), 
+    scale_y_continuous(name = yaxis,
+                       limits = c(limits[1], limits[2]),
+                       breaks = seq(limits[1], limits[2], 0.5),
                        expand = c(0.01, 0.01)) +
-    scale_x_continuous(name = "Chromosome", 
-                       limits = c(0, tail(chrLims[[3]], 1)), 
-                       breaks = chrLims[[2]], 
-                       labels = chrLims[[1]]$values, 
+    scale_x_continuous(name = "Chromosome",
+                       limits = c(0, tail(chrLims[[3]], 1)),
+                       breaks = chrLims[[2]],
+                       labels = chrLims[[1]]$values,
                        expand = c(0, 0)) +
-    geom_vline(xintercept = chrLims[[3]], 
-               color = "#666666", 
-               linetype = "solid", 
+    geom_vline(xintercept = chrLims[[3]],
+               color = "#666666",
+               linetype = "solid",
                size = 0.2) +
-    geom_vline(xintercept = bincytoend, 
-               color = "#666666", 
-               linetype = "dashed", 
+    geom_vline(xintercept = bincytoend,
+               color = "#666666",
+               linetype = "dashed",
                size = 0.2) +
-    geom_point_rast(aes(x = bin, y = cnColumn), 
-                    data = na.omit(tmp), 
-                    color = color, 
-                    shape = ".", 
+    geom_point_rast(aes(x = bin, y = cnColumn),
+                    data = na.omit(tmp),
+                    color = color,
+                    shape = ".",
                     raster.dpi = 300) +
-    geom_point_rast(aes(x = bin, y = segColumn), 
-                    data = na.omit(tmp), 
-                    color = "black", 
-                    size = 0.1, 
+    geom_point_rast(aes(x = bin, y = segColumn),
+                    data = na.omit(tmp),
+                    color = "black",
+                    size = 0.1,
                     raster.dpi = 300) +
     theme_classic() +
     theme(
-      axis.line = element_line(color = "black", 
+      axis.line = element_line(color = "black",
                                size = 0.2),
-      axis.ticks = element_line(color = "black", 
+      axis.ticks = element_line(color = "black",
                                 size = 0.2),
-      axis.text.y = element_text(color = "black", 
+      axis.text.y = element_text(color = "black",
                                  size = fontLabelSize),
-      axis.text.x = element_text(color = "black", 
-                                 size = fontLabelSize, 
+      axis.text.x = element_text(color = "black",
+                                 size = fontLabelSize,
                                  angle = 90),
-      axis.title.y = element_text(color = "black", 
+      axis.title.y = element_text(color = "black",
                                   size = fontLabelSize),
-      axis.title.x = element_text(color = "black", 
+      axis.title.x = element_text(color = "black",
                                   size = fontLabelSize),
-      panel.border = element_rect(color = "black", 
-                                  fill = NA, 
+      panel.border = element_rect(color = "black",
+                                  fill = NA,
                                   size = 0.2)
     ) +
     labs(title = title)
@@ -205,7 +205,7 @@ getCentromereLims <- function(template, build, chrLims = NULL) {
 
 buildtmpGR <- function(template, segmentTable, pair) {
   templateGR <- makeGRangesFromDataFrame(template, keep.extra.columns = T)
-  callTableGR <- makeGRangesFromDataFrame(segmentTable[segmentTable$SampleID == pair[1], ], 
+  callTableGR <- makeGRangesFromDataFrame(segmentTable[segmentTable$SampleID == pair[1], ],
                                           keep.extra.columns = T)
 
   overlaps <- findOverlaps(templateGR, callTableGR)
@@ -214,7 +214,7 @@ buildtmpGR <- function(template, segmentTable, pair) {
   templateGR$call_sample1 <- NA
   templateGR[queryHits(overlaps)]$call_sample1 <- copy_numbers
 
-  callTableGR <- makeGRangesFromDataFrame(segmentTable[segmentTable$SampleID == pair[2], ], 
+  callTableGR <- makeGRangesFromDataFrame(segmentTable[segmentTable$SampleID == pair[2], ],
                                           keep.extra.columns = T)
 
   overlaps <- findOverlaps(templateGR, callTableGR)
@@ -226,18 +226,20 @@ buildtmpGR <- function(template, segmentTable, pair) {
   return(templateGR)
 }
 
-buildbrkMat <- function(breaks, pair, segmentTable, callMat, templateGR, cnType = c("alleleSpecific", "VCF"), maxgap, excludeChromosomes, sharedBarSize = 30) {
+buildbrkMat <- function(breaks, pair, segmentTable, callMat, templateGR, cnType = c("alleleSpecific", "VCF"), maxgap, excludeChromosomes = 'Y', sharedBarSize = 30) {
   if (is.null(breaks)) {
-    brk <- exportSharedBreaks(pair, 
-                              segmentTable, 
-                              cnType = cnType, 
-                              save = FALSE, 
+    brk <- exportSharedBreaks(pair,
+                              segmentTable,
+                              cnType = cnType,
+                              save = FALSE,
                               maxgap = maxgap)
   } else {
     brk <- as.data.table(breaks[[paste0(pair[1], "-", pair[2])]])
   }
 
-  brk <- brk[!excludeChromosomes, on = "seqnames"]
+  if (!isFALSE(excludeChromosomes)){
+    brk <- brk[!excludeChromosomes, on = "seqnames"]
+  }
 
   brk$start <- ifelse(brk$break_shared == "end", brk$end, brk$start)
   brk$end <- ifelse(brk$break_shared == "start", brk$start, brk$end)
@@ -261,7 +263,7 @@ buildbrkMat <- function(breaks, pair, segmentTable, callMat, templateGR, cnType 
 #' @param colors A character vector with colors for sample 1 and sample 2.
 #' @param limits A numeric vector with y axis limits.
 #' @param build The genome build of your copy number data. hg19 and hg38 work, other builds haven't been tested.
-#' @param excludeChromosomes The name(s) of any chromosomes to be excluded.
+#' @param excludeChromosomes The name(s) of any chromosomes to be excluded. Need to be set to FALSE to keep all the chromosomes.
 #' @param fontLabelSize Number indicating size of the labels.
 #' @param maxgap The maximum gap between two breakpoints for them to be considered concordant. If unspecified, it is automatically set to 5 times the average interprobe distance of the assay.
 #' @param sharedBarSize Width of the shared breakpoints bars.
@@ -273,7 +275,9 @@ plotCNpairVCF <- function(binnedTable, cnTable, pair, segmentTable, breaks = NUL
   build <- match.arg(build)
   message("Using genome build ", build)
 
-  segmentTable <- segmentTable[!excludeChromosomes, on = "Chr"]
+  if (!isFALSE(excludeChromosomes)){
+    segmentTable <- segmentTable[!excludeChromosomes, on = "Chr"]
+  }
 
   template <- data.table(
     region = rownames(binnedTable),
@@ -295,7 +299,7 @@ plotCNpairVCF <- function(binnedTable, cnTable, pair, segmentTable, breaks = NUL
   # build callMat
   templateGR <- buildtmpGR(template, segmentTable, pair)
 
-  callMat <- t(as.matrix(data.frame(sample1 = as.data.table(templateGR)[["call_sample1"]], 
+  callMat <- t(as.matrix(data.frame(sample1 = as.data.table(templateGR)[["call_sample1"]],
                                     sample2 = as.data.table(templateGR)[["call_sample2"]])))
   rownames(callMat) <- pair
   colnames(callMat) <- as.data.table(templateGR)[["region"]]
@@ -304,43 +308,43 @@ plotCNpairVCF <- function(binnedTable, cnTable, pair, segmentTable, breaks = NUL
   colorsCN <- structure(c("#b2182b", "#2166ac"), names = c("DUP", "DEL"))
 
   # build brkMat
-  brkMat <- buildbrkMat(breaks, 
-                        pair, 
-                        segmentTable, 
-                        callMat, 
-                        templateGR, 
-                        cnType = 'VCF', 
-                        maxgap, 
-                        excludeChromosomes, 
+  brkMat <- buildbrkMat(breaks,
+                        pair,
+                        segmentTable,
+                        callMat,
+                        templateGR,
+                        cnType = 'VCF',
+                        maxgap,
+                        excludeChromosomes,
                         sharedBarSize)
 
   # segmented plot
-  p1 <- plotCN(tmp = template, 
-               limits, 
-               color = colors[1], 
-               chrLims, 
-               bincytoend, 
-               cnColumn = "copynumber_sample1", 
-               segColumn = "segs_sample1", 
-               title = pair[1], 
-               fontLabelSize, 
+  p1 <- plotCN(tmp = template,
+               limits,
+               color = colors[1],
+               chrLims,
+               bincytoend,
+               cnColumn = "copynumber_sample1",
+               segColumn = "segs_sample1",
+               title = pair[1],
+               fontLabelSize,
                build = build)
-  p2 <- plotCN(tmp = template, 
-               limits, 
-               color = colors[2], 
-               chrLims, 
-               bincytoend, 
-               cnColumn = "copynumber_sample2", 
-               segColumn = "segs_sample2", 
-               title = pair[2], 
-               fontLabelSize, 
+  p2 <- plotCN(tmp = template,
+               limits,
+               color = colors[2],
+               chrLims,
+               bincytoend,
+               cnColumn = "copynumber_sample2",
+               segColumn = "segs_sample2",
+               title = pair[2],
+               fontLabelSize,
                build = build)
 
   # oncoplot
-  p3 <- grid.grabExpr(draw(HeatmapCNPairs(callMat, 
-                                          brkMat, 
-                                          colors, 
-                                          colorsCN, 
+  p3 <- grid.grabExpr(draw(HeatmapCNPairs(callMat,
+                                          brkMat,
+                                          colors,
+                                          colorsCN,
                                           fontLabelSize)))
 
   # grid
@@ -404,51 +408,51 @@ plotCNpairalleleSpecific <- function(ASCATobj, segmentTable, pair, breaks = NULL
   # build callMat
   templateGR <- buildtmpGR(template, segmentTable, pair)
 
-  callMat <- t(as.matrix(data.frame(sample1 = as.data.table(templateGR)[["call_sample1"]], 
+  callMat <- t(as.matrix(data.frame(sample1 = as.data.table(templateGR)[["call_sample1"]],
                                     sample2 = as.data.table(templateGR)[["call_sample2"]])))
   rownames(callMat) <- pair
   colnames(callMat) <- as.data.table(templateGR)[["region"]]
 
   # color annotation for cnas
-  colorsCN <- structure(c("#b2182b", "#f4a582", "#2166ac", "#92c5de"), 
+  colorsCN <- structure(c("#b2182b", "#f4a582", "#2166ac", "#92c5de"),
                         names = c("amp", "gain", "loss", "cnloh"))
 
   # build brkMat
-  brkMat <- buildbrkMat(breaks, 
-                        pair, 
-                        segmentTable, 
-                        callMat, 
+  brkMat <- buildbrkMat(breaks,
+                        pair,
+                        segmentTable,
+                        callMat,
                         templateGR,
-                        cnType = 'alleleSpecific', 
-                        maxgap, 
-                        excludeChromosomes, 
+                        cnType = 'alleleSpecific',
+                        maxgap,
+                        excludeChromosomes,
                         sharedBarSize)
 
   # segmented plot
-  p1 <- plotCN(template, 
-               color = colors[1], 
-               limits = limits, 
-               chrLims, 
-               bincytoend, 
-               cnColumn = "copynumber_sample1", 
-               segColumn = "segs_sample1", 
-               title = paste0(pair[1], ", Ploidy ", round(sample1_ploidy, 1)), 
+  p1 <- plotCN(template,
+               color = colors[1],
+               limits = limits,
+               chrLims,
+               bincytoend,
+               cnColumn = "copynumber_sample1",
+               segColumn = "segs_sample1",
+               title = paste0(pair[1], ", Ploidy ", round(sample1_ploidy, 1)),
                fontLabelSize)
-  p3 <- plotCN(template, 
-               color = colors[2], 
-               limits = limits, 
-               chrLims, 
-               bincytoend, 
-               cnColumn = "copynumber_sample2", 
-               segColumn = "segs_sample2", 
-               title = paste0(pair[2], ", Ploidy ", round(sample2_ploidy, 1)), 
+  p3 <- plotCN(template,
+               color = colors[2],
+               limits = limits,
+               chrLims,
+               bincytoend,
+               cnColumn = "copynumber_sample2",
+               segColumn = "segs_sample2",
+               title = paste0(pair[2], ", Ploidy ", round(sample2_ploidy, 1)),
                fontLabelSize)
 
   # oncoplot
-  p5 <- grid.grabExpr(draw(HeatmapCNPairs(callMat, 
-                                          brkMat, 
-                                          colors, 
-                                          colorsCN, 
+  p5 <- grid.grabExpr(draw(HeatmapCNPairs(callMat,
+                                          brkMat,
+                                          colors,
+                                          colorsCN,
                                           fontLabelSize)))
 
   # grid
@@ -489,55 +493,55 @@ plotSummary <- function(summary, sortBy = c("verdict", "fraction_shared"), color
   }
 
   summary <- summary[order(summary[, sortBy[1]], summary[, sortBy[2]]), ]
-  mat <- as.matrix(data.frame(sample1 = summary$fraction_private_sample1, 
-                              sample2 = summary$fraction_private_sample2, 
+  mat <- as.matrix(data.frame(sample1 = summary$fraction_private_sample1,
+                              sample2 = summary$fraction_private_sample2,
                               shared = summary$fraction_shared))
   row.names(mat) <- patients
 
-  l1 <- Legend(title = "Type", 
-               labels = c("All", 
-                          "Shared", 
-                          paste0(sample1, " private"), 
-                          paste0(sample2, " private")), 
-               legend_gp = gpar(fill = c(colorN, 
-                                         colors[3], 
-                                         colors[1], 
-                                         colors[2])), 
+  l1 <- Legend(title = "Type",
+               labels = c("All",
+                          "Shared",
+                          paste0(sample1, " private"),
+                          paste0(sample2, " private")),
+               legend_gp = gpar(fill = c(colorN,
+                                         colors[3],
+                                         colors[1],
+                                         colors[2])),
                legend_height = unit(0.4, "cm"))
-  l2 <- Legend(title = "", 
-               labels = "Breakclone score", 
-               legend_gp = gpar(fill = colorScore), 
+  l2 <- Legend(title = "",
+               labels = "Breakclone score",
+               legend_gp = gpar(fill = colorScore),
                legend_height = unit(0.4, "cm"))
-  l3 <- Legend(title = "Clonality", 
-               labels = c("Related", "Ambiguous", "Unrelated"), 
-               legend_gp = gpar(fill = colorClonality), 
+  l3 <- Legend(title = "Clonality",
+               labels = c("Related", "Ambiguous", "Unrelated"),
+               legend_gp = gpar(fill = colorClonality),
                legend_height = unit(0.4, "cm"))
 
   if (is.null(extraAnno)) {
     ha_list <-
       HeatmapAnnotation(
-        n = anno_barplot(summary$total, 
-                         gp = gpar(fill = colorN, col = colorN), 
-                         height = unit(1.7, "cm"), 
+        n = anno_barplot(summary$total,
+                         gp = gpar(fill = colorN, col = colorN),
+                         height = unit(1.7, "cm"),
                          border = FALSE),
         annotation_name_rot = 90,
         annotation_name_side = "left",
         annotation_name_gp = gpar(fontsize = 8)
       ) %v%
       HeatmapAnnotation(
-        stacked = anno_barplot(mat, 
-                               gp = gpar(fill = colors, 
-                                         col = colors, 
-                                         border = NA), 
-                               height = unit(1.9, "cm"), 
+        stacked = anno_barplot(mat,
+                               gp = gpar(fill = colors,
+                                         col = colors,
+                                         border = NA),
+                               height = unit(1.9, "cm"),
                                border = FALSE),
         show_annotation_name = FALSE
       ) %v%
       HeatmapAnnotation(
         " " = anno_barplot(summary$pair_scores,
-          gp = gpar(fill = colorScore, 
-                    col = colorScore, 
-                    border = NA, 
+          gp = gpar(fill = colorScore,
+                    col = colorScore,
+                    border = NA,
                     lty = "blank"), height = unit(1.7, "cm"), border = FALSE
         ),
         annotation_name_rot = 90,
@@ -547,15 +551,15 @@ plotSummary <- function(summary, sortBy = c("verdict", "fraction_shared"), color
       HeatmapAnnotation(
         relatedness = summary$verdict,
         " " = extraAnno,
-        col = list(relatedness = c("Related" = colorClonality[1], 
-                                   "Ambiguous" = colorClonality[2], 
+        col = list(relatedness = c("Related" = colorClonality[1],
+                                   "Ambiguous" = colorClonality[2],
                                    "Unrelated" = colorClonality[3])),
         show_annotation_name = FALSE,
         border = TRUE,
         show_legend = FALSE,
         simple_anno_size = unit(0.35, "cm")
       ) %v%
-      HeatmapAnnotation(id = anno_text(gt_render(rownames(mat), 
+      HeatmapAnnotation(id = anno_text(gt_render(rownames(mat),
                                                  gp = gpar(fontsize = 7))))
 
     draw(ha_list, heatmap_legend_list = list(l1, l2, l3))
@@ -566,30 +570,30 @@ plotSummary <- function(summary, sortBy = c("verdict", "fraction_shared"), color
 
     ha_list <-
       HeatmapAnnotation(
-        n = anno_barplot(summary$total, 
-                         gp = gpar(fill = colorN, col = colorN), 
-                         height = unit(1.7, "cm"), 
+        n = anno_barplot(summary$total,
+                         gp = gpar(fill = colorN, col = colorN),
+                         height = unit(1.7, "cm"),
                          border = FALSE),
         annotation_name_rot = 90,
         annotation_name_side = "left",
         annotation_name_gp = gpar(fontsize = 8)
       ) %v%
       HeatmapAnnotation(
-        stacked = anno_barplot(mat, 
-                               gp = gpar(fill = colors, 
-                                         col = colors, 
-                                         border = NA), 
-                               height = unit(1.9, "cm"), 
+        stacked = anno_barplot(mat,
+                               gp = gpar(fill = colors,
+                                         col = colors,
+                                         border = NA),
+                               height = unit(1.9, "cm"),
                                border = FALSE),
         show_annotation_name = FALSE
       ) %v%
       HeatmapAnnotation(
         " " = anno_barplot(summary$pair_scores,
-          gp = gpar(fill = colorScore, 
-                    col = colorScore, 
-                    border = NA, 
-                    lty = "blank"), 
-          height = unit(1.7, "cm"), 
+          gp = gpar(fill = colorScore,
+                    col = colorScore,
+                    border = NA,
+                    lty = "blank"),
+          height = unit(1.7, "cm"),
           border = FALSE
         ),
         annotation_name_rot = 90,
@@ -600,8 +604,8 @@ plotSummary <- function(summary, sortBy = c("verdict", "fraction_shared"), color
         relatedness = summary$verdict,
         " " = extraAnno,
         col = list(
-          relatedness = c("Related" = colorClonality[1], 
-                          "Ambiguous" = colorClonality[2], 
+          relatedness = c("Related" = colorClonality[1],
+                          "Ambiguous" = colorClonality[2],
                           "Unrelated" = colorClonality[3]),
           " " = colorsExtraAnno
         ),
@@ -610,12 +614,12 @@ plotSummary <- function(summary, sortBy = c("verdict", "fraction_shared"), color
         show_legend = FALSE,
         simple_anno_size = unit(0.35, "cm")
       ) %v%
-      HeatmapAnnotation(id = anno_text(gt_render(rownames(mat), 
+      HeatmapAnnotation(id = anno_text(gt_render(rownames(mat),
                                                  gp = gpar(fontsize = 7))))
 
-    l4 <- Legend(title = "", 
-                 labels = names(colorsExtraAnno), 
-                 legend_gp = gpar(fill = colorsExtraAnno), 
+    l4 <- Legend(title = "",
+                 labels = names(colorsExtraAnno),
+                 legend_gp = gpar(fill = colorsExtraAnno),
                  legend_height = unit(0.4, "cm"))
     draw(ha_list, heatmap_legend_list = list(l1, l2, l3, l4))
   }
@@ -652,38 +656,38 @@ plotScatterVAF <- function(mutationTable, pair, title = "", xlab = "Primary", yl
   hits <- getHitMut(sample1, sample2, pair, scaleAFs)
 
   if (length(hits[[1]]) > 0) {
-    shared <- data.table(sample1 = as.data.table(hits[[1]])[["AF"]], 
-                         sample2 = as.data.table(hits[[2]])[["AF"]], 
-                         Type = "Shared", 
+    shared <- data.table(sample1 = as.data.table(hits[[1]])[["AF"]],
+                         sample2 = as.data.table(hits[[2]])[["AF"]],
+                         Type = "Shared",
                          annotation = as.data.table(hits[[1]])[["annotation"]])
   } else {
-    shared <- data.table(sample1 = numeric(), 
-                         sample2 = numeric(), 
-                         Type = character(), 
+    shared <- data.table(sample1 = numeric(),
+                         sample2 = numeric(),
+                         Type = character(),
                          annotation = character())
   }
 
   if (length(hits[[3]]) > 0) {
-    private_sample1 <- data.table(sample1 = as.data.table(hits[[3]])[["AF"]], 
-                                  sample2 = rep(0, length(hits[[3]])), 
-                                  Type = paste0(xlab, " private"), 
+    private_sample1 <- data.table(sample1 = as.data.table(hits[[3]])[["AF"]],
+                                  sample2 = rep(0, length(hits[[3]])),
+                                  Type = paste0(xlab, " private"),
                                   annotation = as.data.table(hits[[3]])[["annotation"]])
   } else {
-    private_sample1 <- data.table(sample1 = numeric(), 
-                                  sample2 = numeric(), 
-                                  Type = character(), 
+    private_sample1 <- data.table(sample1 = numeric(),
+                                  sample2 = numeric(),
+                                  Type = character(),
                                   annotation = character())
   }
 
   if (length(hits[[4]]) > 0) {
-    private_sample2 <- data.table(sample1 = rep(0, length(hits[[4]])), 
-                                  sample2 = as.data.table(hits[[4]])[["AF"]], 
-                                  Type = paste0(ylab, " private"), 
+    private_sample2 <- data.table(sample1 = rep(0, length(hits[[4]])),
+                                  sample2 = as.data.table(hits[[4]])[["AF"]],
+                                  Type = paste0(ylab, " private"),
                                   annotation = as.data.table(hits[[4]])[["annotation"]])
   } else {
-    private_sample2 <- data.table(sample1 = numeric(), 
-                                  sample2 = numeric(), 
-                                  Type = character(), 
+    private_sample2 <- data.table(sample1 = numeric(),
+                                  sample2 = numeric(),
+                                  Type = character(),
                                   annotation = character())
   }
 
@@ -697,7 +701,7 @@ plotScatterVAF <- function(mutationTable, pair, title = "", xlab = "Primary", yl
     xlab(xlab) +
     ylab(ylab) +
     theme(
-      panel.grid = element_blank(), 
+      panel.grid = element_blank(),
       panel.background = element_rect(fill = "white", colour = "black"),
       axis.text = element_text(size = fontLabelSize),
       axis.title = element_text(size = fontLabelSize),
@@ -709,11 +713,11 @@ plotScatterVAF <- function(mutationTable, pair, title = "", xlab = "Primary", yl
     ylim(limits)
 
   if (isTRUE(annotGenes)) {
-    p <- p + geom_text(aes(label = annotation), 
-                       check_overlap = TRUE, 
-                       nudge_x = dotSize * 0.01, 
-                       nudge_y = dotSize * 0.01, 
-                       size = fontAnnotSize, 
+    p <- p + geom_text(aes(label = annotation),
+                       check_overlap = TRUE,
+                       nudge_x = dotSize * 0.01,
+                       nudge_y = dotSize * 0.01,
+                       size = fontAnnotSize,
                        show.legend = FALSE)
   }
 

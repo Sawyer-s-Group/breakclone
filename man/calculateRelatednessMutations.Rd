@@ -25,7 +25,7 @@ calculateRelatednessMutations(
 
 \item{reference}{A numeric vector of pair scores comprising the reference distribution, generated from the \code{makeReferenceMutations} function. If omitted, p-value calculation will be skipped.}
 
-\item{excludeChromosomes}{The name(s) of any chromosomes to be excluded.}
+\item{excludeChromosomes}{The name(s) of any chromosomes to be excluded. Need to be set to FALSE to keep all the chromosomes.}
 
 \item{scaleAFs}{Scale AFs per-sample by the highest AF within each sample. Only recommended for data with significant normal contamination that you are confident contains at least one clonal mutation per sample.}
 }

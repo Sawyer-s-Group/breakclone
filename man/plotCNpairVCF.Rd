@@ -36,7 +36,7 @@ plotCNpairVCF(
 
 \item{build}{The genome build of your copy number data. hg19 and hg38 work, other builds haven't been tested.}
 
-\item{excludeChromosomes}{The name(s) of any chromosomes to be excluded.}
+\item{excludeChromosomes}{The name(s) of any chromosomes to be excluded. Need to be set to FALSE to keep all the chromosomes.}
 
 \item{fontLabelSize}{Number indicating size of the labels.}
 

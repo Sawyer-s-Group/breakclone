@@ -78,13 +78,17 @@ getScoreMutations <- function(mutationTable, pair, populationMutations, nAdditio
 #' @param additionalMutations A table of mutations to be taken into account when calculating population frequencies. At a minimum, a table of the mutations in the population being studied. This is more informative when tumour type-specific mutations are included from external sources (e.g. TCGA).
 #' @param nAdditionalSamples The number of samples used to derive the additional mutations table.
 #' @param reference A numeric vector of pair scores comprising the reference distribution, generated from the \code{makeReferenceMutations} function. If omitted, p-value calculation will be skipped.
-#' @param excludeChromosomes The name(s) of any chromosomes to be excluded.
+#' @param excludeChromosomes The name(s) of any chromosomes to be excluded. Need to be set to FALSE to keep all the chromosomes.
 #' @param scaleAFs Scale AFs per-sample by the highest AF within each sample. Only recommended for data with significant normal contamination that you are confident contains at least one clonal mutation per sample.
 #' @author argymeg
 #' @return A data frame listing the tumour pairs contained in \code{pairs}, their relatedness scores and p-values for relatedness.
 #' @export
 calculateRelatednessMutations <- function(mutationTable, pairs, additionalMutations = NULL, nAdditionalSamples = 0, reference = NULL, excludeChromosomes = "chrY", scaleAFs = FALSE) {
-  mutationTable <- mutationTable[!excludeChromosomes, on = "Chr"]
+
+  if (!isFALSE(excludeChromosomes)){
+    mutationTable <- mutationTable[!excludeChromosomes, on = "Chr"]
+  }
+
   populationMutations <- collatePopulationMutations(mutationTable)
   if (!is.null(additionalMutations)) {
     populationMutations <- c(populationMutations, additionalMutations)
@@ -113,7 +117,7 @@ calculateRelatednessMutations <- function(mutationTable, pairs, additionalMutati
 #' @param delimiter A character separating patient IDs from tumour-specific identifiers in the sample IDs. Ignored if \code{patients} is provided.
 #' @param additionalMutations A table of mutations to be taken into account when calculating population frequencies. At a minimum, a table of the mutations in the population being studied. This is more informative when tumour type-specific mutations are included from external sources (e.g. TCGA).
 #' @param nAdditionalSamples The number of samples used to derive the additional mutations table.
-#' @param excludeChromosomes The name(s) of any chromosomes to be excluded.
+#' @param excludeChromosomes The name(s) of any chromosomes to be excluded. Need to be set to FALSE to keep all the chromosomes.
 #' @param scaleAFs Scale AFs per-sample by the highest AF within each sample. Only recommended for data with significant normal contamination that you are confident contains at least one clonal mutation per sample.
 #' @author argymeg
 #' @return A numeric vector of pair scores comprising the reference distribution.
@@ -140,7 +144,10 @@ makeReferenceMutations <- function(mutationTable, pairs, patients = NULL, delimi
 
   message("Making reference based on ", nrow(refPairs), " possible pairs, this might take a while")
 
-  mutationTable <- mutationTable[!excludeChromosomes, on = "Chr"]
+  if (!isFALSE(excludeChromosomes)){
+    mutationTable <- mutationTable[!excludeChromosomes, on = "Chr"]
+  }
+
   populationMutations <- collatePopulationMutations(mutationTable)
   if (!is.null(additionalMutations)) {
     populationMutations <- c(populationMutations, additionalMutations)

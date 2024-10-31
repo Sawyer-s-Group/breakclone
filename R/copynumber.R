@@ -151,14 +151,18 @@ calculateMaxGap <- function(segmentTable, cnType) {
 #' @param pairs A table of paired samples from the dataset, to test for relatedness.
 #' @param reference A numeric vector of pair scores comprising the reference distribution, generated from the \code{makeReferenceCN} function. If omitted, p-value calculation will be skipped.
 #' @param cnType The type of copy number data provided. Currently supported options are a custom allele specific data format, and standard copy number VCF files.
-#' @param excludeChromosomes The name(s) of any chromosomes to be excluded.
+#' @param excludeChromosomes The name(s) of any chromosomes to be excluded. Need to be set to FALSE to keep all the chromosomes.
 #' @param maxgap The maximum gap between two breakpoints for them to be considered concordant. If unspecified, it is automatically set to 5 times the average interprobe distance of the assay.
 #' @author argymeg
 #' @return A data frame listing the tumour pairs contained in \code{pairs}, their relatedness scores and p-values for relatedness.
 #' @export
 calculateRelatednessCn <- function(segmentTable, pairs, reference = NULL, cnType = c("alleleSpecific", "VCF"), excludeChromosomes = "Y", maxgap = NULL) {
   cnType <- match.arg(cnType)
-  segmentTable <- segmentTable[!excludeChromosomes, on = "Chr"]
+
+  if (!isFALSE(excludeChromosomes)){
+    segmentTable <- segmentTable[!excludeChromosomes, on = "Chr"]
+  }
+
   populationBreakpoints <- collatePopulationBreakpoints(segmentTable, cnType)
   if (is.null(maxgap)) {
     maxgap <- calculateMaxGap(segmentTable, cnType)
@@ -191,7 +195,7 @@ calculateRelatednessCn <- function(segmentTable, pairs, reference = NULL, cnType
 #' @param patients A character vector of patient IDs, parallel to the pairs table, used to prevent tumours originating from the same patient from being used in the reference distribution (optional).
 #' @param delimiter A character separating patient IDs from tumour-specific identifiers in the sample IDs. Ignored if \code{patients} is provided (optional).
 #' @param cnType The type of copy number data provided. Currently supported options are a custom allele specific data format, and standard copy number VCF files.
-#' @param excludeChromosomes The name(s) of any chromosomes to be excluded.
+#' @param excludeChromosomes The name(s) of any chromosomes to be excluded. Need to be set to FALSE to keep all the chromosomes.
 #' @param maxgap The maximum gap between two breakpoints for them to be considered concordant. If unspecified, it is automatically set to 5 times the average interprobe distance of the assay.
 #' @author argymeg
 #' @return A numeric vector of pair scores comprising the reference distribution.
@@ -219,7 +223,11 @@ makeReferenceCN <- function(segmentTable, pairs, patients = NULL, delimiter = NU
   message("Making reference based on ", nrow(refPairs), " possible pairs, this might take a while")
 
   cnType <- match.arg(cnType)
-  segmentTable <- segmentTable[!excludeChromosomes, on = "Chr"]
+
+  if (!isFALSE(excludeChromosomes)){
+    segmentTable <- segmentTable[!excludeChromosomes, on = "Chr"]
+  }
+
   populationBreakpoints <- collatePopulationBreakpoints(segmentTable, cnType)
   if (is.null(maxgap)) {
     maxgap <- calculateMaxGap(segmentTable, cnType)
