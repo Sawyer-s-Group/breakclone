@@ -80,20 +80,27 @@ readVCFCn <- function(directory, pattern = "*.vcf") {
 #' @return A data.frame with column names Sample1 and Sample2
 #' @export
 inferPairs <- function(segmentTable, sep = "_") {
+  # Extract sample IDs from segmentTable
   samples <- unique(segmentTable$SampleID)
-  patients <- unique(sub(paste0(sep, ".+"), "", samples))
-  pairs <- lapply(patients, grep, samples)
-  triplets <- pairs[lengths(pairs) == 3]
-  pairs <- pairs[lengths(pairs) == 2]
-  pairs <- unlist(pairs)
-  if (length(triplets) > 0) {
-    triplets <- as.vector(sapply(triplets, combn, 2))
-    pairs <- c(pairs, triplets)
-  }
-  pairs <- as.data.frame(matrix(pairs, nrow = length(pairs) / 2, byrow = T))
-  pairs$V1 <- samples[pairs$V1]
-  pairs$V2 <- samples[pairs$V2]
-  colnames(pairs) <- c("Sample1", "Sample2")
+
+  # Extract patient ID
+  patients <- sub(paste0(sep, ".+"), "", samples)
+
+  # Group samples by patient ID
+  splitSamples <- split(samples, patients)
+
+  # Generate all possible combinations for each patient
+  pairs <- lapply(splitSamples, function(patientSamples) {
+    combn(patientSamples, 2, simplify = FALSE) # Get all pairs
+  })
+
+  # Combine into a data.table
+  pairs <- rbindlist(lapply(pairs, function(pairs) {
+    do.call(rbind, lapply(pairs, function(pair) {
+      data.table(Sample1 = pair[1], Sample2 = pair[2])
+    }))
+  }), use.names = TRUE)
+
   return(pairs)
 }
 
