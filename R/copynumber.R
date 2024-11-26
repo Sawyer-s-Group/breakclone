@@ -200,7 +200,7 @@ calculateRelatednessCn <- function(segmentTable, pairs, reference = NULL, cnType
 #' @author argymeg
 #' @return A numeric vector of pair scores comprising the reference distribution.
 #' @export
-makeReferenceCN <- function(segmentTable, pairs, patients = NULL, delimiter = NULL, cnType = c("alleleSpecific", "VCF"), excludeChromosomes = "Y", maxgap = NULL) {
+makeReferenceCN <- function(segmentTable, pairs, patients = NULL, delimiter = '_', cnType = c("alleleSpecific", "VCF"), excludeChromosomes = "Y", maxgap = NULL) {
   if (is.null(patients) & is.null(delimiter)) {
     patients <- as.character(seq(1, nrow(pairs)))
   } else if (is.null(patients)) {

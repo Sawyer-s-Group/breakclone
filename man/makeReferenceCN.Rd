@@ -8,7 +8,7 @@ makeReferenceCN(
   segmentTable,
   pairs,
   patients = NULL,
-  delimiter = NULL,
+  delimiter = "_",
   cnType = c("alleleSpecific", "VCF"),
   excludeChromosomes = "Y",
   maxgap = NULL
