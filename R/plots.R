@@ -62,14 +62,9 @@ plotScoresHistogram <- function(reference, results) {
 
 plotCN <- function(tmp, limits, color, chrLims = NULL, bincytoend = NULL, cnColumn = NULL, segColumn = NULL, title = NULL, fontLabelSize, yaxis = "Log2 Ratio", build = c("hg38", "hg19")) {
   build <- match.arg(build)
-  if (is.null(chrLims)) {
-    chrLims <- getChrLims(template)
-  }
-  if (is.null(bincytoend)) {
-    bincytoend <- getCentromereLims(template, build, chrLims)
-  }
+  if (is.null(chrLims)) chrLims <- getChrLims(template)
+  if (is.null(bincytoend)) bincytoend <- getCentromereLims(template, build, chrLims)
 
-  colnames(tmp)[colnames(tmp) == cnColumn] <- "cnColumn"
   colnames(tmp)[colnames(tmp) == segColumn] <- "segColumn"
 
   p <- ggplot() +
@@ -97,13 +92,21 @@ plotCN <- function(tmp, limits, color, chrLims = NULL, bincytoend = NULL, cnColu
       color = "#666666",
       linetype = "dashed",
       size = 0.2
-    ) +
-    geom_point_rast(aes(x = bin, y = cnColumn),
-      data = na.omit(tmp),
-      color = color,
-      shape = ".",
-      raster.dpi = 300
-    ) +
+    )
+
+  if (cnColumn %in% colnames(tmp)){
+    colnames(tmp)[colnames(tmp) == cnColumn] <- "cnColumn"
+
+    p <- p +
+      geom_point_rast(aes(x = bin, y = cnColumn),
+                      data = na.omit(tmp),
+                      color = color,
+                      shape = ".",
+                      raster.dpi = 300
+      )
+  }
+
+  p <- p +
     geom_point_rast(aes(x = bin, y = segColumn),
       data = na.omit(tmp),
       color = "black",
@@ -144,10 +147,74 @@ plotCN <- function(tmp, limits, color, chrLims = NULL, bincytoend = NULL, cnColu
       )
     ) +
     labs(title = title)
+
   return(p)
+
 }
 
-HeatmapCNPairs <- function(callMat, brkMat, colors, colorsCN, fontLabelSize) {
+HeatmapCN <- function(segmentTable, callMat = NULL, brkMat = NULL, colors = c("#f1562f", "#8a4e97"), colorsCN = NULL, fontLabelSize = 7, cnType = c('alleleSpecific', 'VCF'), pair, excludeChromosomes = 'Y', sharedBarSize = 30, build = 'hg38') {
+  if (is.null(callMat)){
+    data(list = paste0('bins_', build))
+    template <- bins
+
+    template$bin <- 1:nrow(template)
+    template <- template[!excludeChromosomes, on = "chr"]
+    template <- template[order(chr, start), ]
+
+    # Ensure the columns are of the correct type
+    template[, segs_sample1 := as.numeric(segs_sample1)]
+    template[, segs_sample2 := as.numeric(segs_sample2)]
+
+    if (cnType == 'alleleSpecific'){
+      # Call CNAs
+      sample1 <- callalleleSpecificCN(segmentTable[segmentTable$SampleID == pair[1], ])
+      sample2 <- callalleleSpecificCN(segmentTable[segmentTable$SampleID == pair[2], ])
+
+      sample1_ploidy <- calculatePloidy(sample1)
+      sample2_ploidy <- calculatePloidy(sample2)
+
+      segmentTable <- rbind(sample1, sample2)
+    } else if (cnType == 'VCF'){
+      # Call CNAs
+      sample1 <- segmentTable[segmentTable$SampleID == pair[1], ]
+      sample2 <- segmentTable[segmentTable$SampleID == pair[2], ]
+
+      segmentTable <- rbind(sample1, sample2)
+    }
+
+    templateGR <- buildtmpGR(template, segmentTable, pair)
+
+    callMat <- t(as.matrix(data.frame(
+      sample1 = as.data.table(templateGR)[["call_sample1"]],
+      sample2 = as.data.table(templateGR)[["call_sample2"]]
+    )))
+    rownames(callMat) <- pair
+    colnames(callMat) <- as.data.table(templateGR)[["region"]]
+  }
+
+  if (is.null(brkMat)){
+    brkMat <- buildbrkMat(
+      pair = pair,
+      segmentTable = segmentTable,
+      callMat = callMat,
+      templateGR = templateGR,
+      cnType = cnType,
+      excludeChromosomes = excludeChromosomes,
+      sharedBarSize = sharedBarSize
+    )
+  }
+
+  if (is.null(colorsCN)){
+    if (cnType == 'VCF'){
+      colorsCN <- structure(c("#b2182b", "#2166ac"), names = c("DUP", "DEL"))
+    } else if (cnType == 'alleleSpecific') {
+      colorsCN <- structure(
+        c("#b2182b", "#f4a582", "#2166ac", "#92c5de"),
+        names = c("amp", "gain", "loss", "cnloh")
+      )
+    }
+  }
+
   ht <- Heatmap(
     callMat,
     use_raster = T,
@@ -213,7 +280,9 @@ getCentromereLims <- function(template, build, chrLims = NULL) {
   if (is.null(chrLims)) {
     chrLims <- getChrLims(template)
   }
-  cytobands <- fread(paste0("http://hgdownload.cse.ucsc.edu/goldenpath/", build, "/database/cytoBand.txt.gz")) # download cytoband details from UCSC    cytobands[[1]] <- gsub("chr","",cytobands[[1]])
+
+  data(list = paste0('cytoBand_', build))
+
   cytobands[[1]] <- gsub("chr", "", cytobands[[1]])
   cytobands <- cytobands[cytobands[[1]] %in% as.character(unique(template$chr)), ]
   cytobands[[4]] <- gsub("[[:punct:]]", "", gsub("[0-9]+", "", as.character(cytobands[[4]])))
@@ -262,13 +331,14 @@ buildtmpGR <- function(template, segmentTable, pair) {
   return(templateGR)
 }
 
-buildbrkMat <- function(breaks, pair, segmentTable, callMat, templateGR, cnType = c("alleleSpecific", "VCF"), maxgap, excludeChromosomes = "Y", sharedBarSize = 30) {
+buildbrkMat <- function(breaks = NULL, pair, segmentTable, callMat, templateGR, cnType = c("alleleSpecific", "VCF"), maxgap = NULL, excludeChromosomes = "Y", sharedBarSize = 30) {
   if (is.null(breaks)) {
     if (is.null(maxgap)) {
       maxgap <- calculateMaxGap(segmentTable, cnType)
     }
 
-    brk <- exportSharedBreaks(pair,
+    brk <- exportSharedBreaks(
+      pair,
       segmentTable,
       cnType = cnType,
       save = FALSE,
@@ -301,7 +371,7 @@ buildbrkMat <- function(breaks, pair, segmentTable, callMat, templateGR, cnType 
 #' @param binnedTable A segmented copy number matrix with bins per row and samples per column.
 #' @param cnTable A raw copy number matrix with bins per row and samples per column.
 #' @param pair A character vector with sample1 and sample2 IDs.
-#' @param segmentTable A segment table generated by the breakclone::readAlleleSpecific or breakclone::readVCFCn functions. Also a list with a segment table of each type to plot both kind of data together.
+#' @param segmentTable A segment table generated by the readVCFCn functions.
 #' @param breaks List of shared breakpoints per pair It will generate a tsv file per pair in outdir with shared breakpoints.
 #' @param colors A character vector with colors for sample 1 and sample 2.
 #' @param limits A numeric vector with y axis limits.
@@ -365,7 +435,7 @@ plotCNpairVCF <- function(binnedTable, cnTable, pair, segmentTable, breaks = NUL
     sharedBarSize = sharedBarSize
   )
 
-  # segmented plot
+  # Segmented plot
   p1 <- plotCN(
     tmp = template,
     limits,
@@ -393,13 +463,18 @@ plotCNpairVCF <- function(binnedTable, cnTable, pair, segmentTable, breaks = NUL
   )
 
   # oncoplot
-  p3 <- grid.grabExpr(draw(HeatmapCNPairs(
-    callMat,
-    brkMat,
-    colors,
-    colorsCN,
-    fontLabelSize
-  )))
+  p3 <- grid.grabExpr(
+    draw(
+      HeatmapCN(
+        segmentTable,
+        callMat,
+        brkMat,
+        colors,
+        colorsCN,
+        fontLabelSize
+        )
+      )
+    )
 
   # grid
   grid <- ggarrange(p1, p2, p3, ncol = 1, nrow = 3)
@@ -409,8 +484,8 @@ plotCNpairVCF <- function(binnedTable, cnTable, pair, segmentTable, breaks = NUL
 
 #' Plot a alleleSpecific copy number pair with breakpoints.
 #'
-#' @param ASCATobj ASCATobj an ASCAT object (e.g. from ascat.aspcf)
-#' @param segmentTable A segment table generated by the readAlleleSpecific or readVCFCn functions.
+#' @param ASCATobj ASCATobj an ASCAT object (from ascat.aspcf)
+#' @param segmentTable A segment table generated by the readAlleleSpecific function.
 #' @param pair A character vector with sample1 and sample2 IDs.
 #' @param breaks List of shared breakpoints per pair It will generate a tsv file per pair in outdir with shared breakpoints.
 #' @param colors A character vector with colors for sample 1 and sample 2.
@@ -424,33 +499,11 @@ plotCNpairVCF <- function(binnedTable, cnTable, pair, segmentTable, breaks = NUL
 #' \email{maria.roman-escorza@@kcl.ac.uk}
 #' @return Copy number plot.
 #' @export
-plotCNpairalleleSpecific <- function(ASCATobj, segmentTable, pair, breaks = NULL, colors = c("#f1562f", "#8a4e97"), limits = c(-1.5, 2), build = c("hg38", "hg19"), excludeChromosomes = "Y", fontLabelSize = 7, maxgap = NULL, sharedBarSize = 30) {
+plotCNpairalleleSpecific <- function(segmentTable, pair, ASCATobj = NULL, breaks = NULL, colors = c("#f1562f", "#8a4e97"), limits = c(-1.5, 2), build = c("hg38", "hg19"), excludeChromosomes = "Y", fontLabelSize = 7, maxgap = NULL, sharedBarSize = 30) {
   build <- match.arg(build)
   message("Using genome build ", build)
 
-  arraynr_s1 <- which(ASCATobj$samples == pair[1])
-  arraynr_s2 <- which(ASCATobj$samples == pair[2])
-  template <- data.table(
-    region = paste0(ASCATobj$SNPpos$chrs, ":", ASCATobj$SNPpos$pos, "-", ASCATobj$SNPpos$pos),
-    chr = factor(ASCATobj$SNPpos$chrs, levels = c(1:22, "X", "Y")),
-    start = ASCATobj$SNPpos$pos,
-    end = ASCATobj$SNPpos$pos + 1,
-    copynumber_sample1 = ASCATobj$Tumor_LogR[, arraynr_s1],
-    segs_sample1 = ASCATobj$Tumor_LogR_segmented[, arraynr_s1],
-    copynumber_sample2 = ASCATobj$Tumor_LogR[, arraynr_s2],
-    segs_sample2 = ASCATobj$Tumor_LogR_segmented[, arraynr_s2],
-    snp = rownames(ASCATobj$Tumor_BAF),
-    bin = 1:nrow(ASCATobj$SNPpos)
-  )
-  rownames(template) <- template$snp
-  template <- template[!excludeChromosomes, on = "chr"]
-  template <- template[order(chr, start), ]
-
-  # define chromosome and centromere limits
-  chrLims <- getChrLims(template)
-  bincytoend <- getCentromereLims(template, build, chrLims)
-
-  # call cnas
+  # Call CNAs
   sample1 <- callalleleSpecificCN(segmentTable[segmentTable$SampleID == pair[1], ])
   sample2 <- callalleleSpecificCN(segmentTable[segmentTable$SampleID == pair[2], ])
 
@@ -458,6 +511,52 @@ plotCNpairalleleSpecific <- function(ASCATobj, segmentTable, pair, breaks = NULL
   sample2_ploidy <- calculatePloidy(sample2)
 
   segmentTable <- rbind(sample1, sample2)
+
+  # Prepare template
+  if (!is.null(ASCATobj)) {
+    yaxis <- 'Log2 Ratio'
+
+    arraynr_s1 <- which(ASCATobj$samples == pair[1])
+    arraynr_s2 <- which(ASCATobj$samples == pair[2])
+    template <- data.table(
+      region = paste0(ASCATobj$SNPpos$chrs, ":", ASCATobj$SNPpos$pos, "-", ASCATobj$SNPpos$pos),
+      chr = factor(ASCATobj$SNPpos$chrs, levels = c(1:22, "X", "Y")),
+      start = ASCATobj$SNPpos$pos,
+      end = ASCATobj$SNPpos$pos + 1,
+      copynumber_sample1 = ASCATobj$Tumor_LogR[, arraynr_s1],
+      segs_sample1 = ASCATobj$Tumor_LogR_segmented[, arraynr_s1],
+      copynumber_sample2 = ASCATobj$Tumor_LogR[, arraynr_s2],
+      segs_sample2 = ASCATobj$Tumor_LogR_segmented[, arraynr_s2]
+    )
+
+  } else {
+    yaxis <- 'Copies'
+
+    data(list = paste0('bins_', build))
+    template <- bins
+    template$segs_sample1 <- NA
+    template$segs_sample2 <- NA
+
+    # Ensure the columns are of the correct type
+    template[, segs_sample1 := as.numeric(segs_sample1)]
+    template[, segs_sample2 := as.numeric(segs_sample2)]
+
+    # Assign nTotal to bins for Patient1_Primary
+    template[segmentTable[SampleID == pair[1]], on = .(chr = Chr, start <= End, end >= Start),
+         segs_sample1 := nTotal]
+
+    # Assign nTotal to bins for Patient1_Recurrence
+    template[segmentTable[SampleID == pair[2]], on = .(chr = Chr, start <= End, end >= Start),
+         segs_sample2 := nTotal]
+  }
+
+  template$bin <- 1:nrow(template)
+  template <- template[!excludeChromosomes, on = "chr"]
+  template <- template[order(chr, start), ]
+
+  # define chromosome and centromere limits
+  chrLims <- getChrLims(template)
+  bincytoend <- getCentromereLims(template, build, chrLims)
 
   # build callMat
   templateGR <- buildtmpGR(template, segmentTable, pair)
@@ -470,12 +569,14 @@ plotCNpairalleleSpecific <- function(ASCATobj, segmentTable, pair, breaks = NULL
   colnames(callMat) <- as.data.table(templateGR)[["region"]]
 
   # color annotation for cnas
-  colorsCN <- structure(c("#b2182b", "#f4a582", "#2166ac", "#92c5de"),
+  colorsCN <- structure(
+    c("#b2182b", "#f4a582", "#2166ac", "#92c5de"),
     names = c("amp", "gain", "loss", "cnloh")
   )
 
   # build brkMat
-  brkMat <- buildbrkMat(breaks,
+  brkMat <- buildbrkMat(
+    breaks,
     pair,
     segmentTable,
     callMat,
@@ -486,8 +587,9 @@ plotCNpairalleleSpecific <- function(ASCATobj, segmentTable, pair, breaks = NULL
     sharedBarSize
   )
 
-  # segmented plot
-  p1 <- plotCN(template,
+  # Segmented plot
+  p1 <- plotCN(
+    template,
     color = colors[1],
     limits = limits,
     chrLims,
@@ -495,8 +597,10 @@ plotCNpairalleleSpecific <- function(ASCATobj, segmentTable, pair, breaks = NULL
     cnColumn = "copynumber_sample1",
     segColumn = "segs_sample1",
     title = paste0(pair[1], ", Ploidy ", round(sample1_ploidy, 1)),
-    fontLabelSize
+    fontLabelSize,
+    yaxis = yaxis
   )
+
   p3 <- plotCN(template,
     color = colors[2],
     limits = limits,
@@ -505,17 +609,23 @@ plotCNpairalleleSpecific <- function(ASCATobj, segmentTable, pair, breaks = NULL
     cnColumn = "copynumber_sample2",
     segColumn = "segs_sample2",
     title = paste0(pair[2], ", Ploidy ", round(sample2_ploidy, 1)),
-    fontLabelSize
+    fontLabelSize,
+    yaxis = yaxis
   )
 
-  # oncoplot
-  p5 <- grid.grabExpr(draw(HeatmapCNPairs(
-    callMat,
-    brkMat,
-    colors,
-    colorsCN,
-    fontLabelSize
-  )))
+  # Oncoplot
+  p5 <- grid.grabExpr(
+    draw(
+      HeatmapCN(
+        segmentTable,
+        callMat,
+        brkMat,
+        colors,
+        colorsCN,
+        fontLabelSize
+        )
+      )
+    )
 
   # grid
   grid <- ggarrange(p1, p3, p5, ncol = 1, nrow = 3)
@@ -731,7 +841,7 @@ plotSummary <- function(summary, sortBy = c("verdict", "fraction_shared"), color
 #' @param fontLabelSize Number indicating size of the labels.
 #' @param dotSize Size of the dots.
 #' @param annotGenes FALSE by default. TRUE if you want to make dot annotation. Extra column needs to be added to mutationTable if this is TRUE.
-#' @param fontAnnotSize
+#' @param fontAnnotSize Number indicating size of the annotated text.
 #' @param fontLabelSize Number indicating size of the annotated text.
 #' @param scaleAFs Scale AFs per-sample by the highest AF within each sample. Only recommended for data with significant normal contamination that you are confident contains at least one clonal mutation per sample.
 #' @author Maria Roman Escorza
@@ -820,13 +930,15 @@ plotScatterVAF <- function(mutationTable, pair, title = "", xlab = "Primary", yl
     ylim(limits)
 
   if (isTRUE(annotGenes)) {
-    p <- p + geom_text(aes(label = annotation),
-      check_overlap = TRUE,
-      nudge_x = dotSize * 0.01,
-      nudge_y = dotSize * 0.01,
-      size = fontAnnotSize,
-      show.legend = FALSE
-    )
+    p <- p +
+      geom_text(
+        aes(label = annotation),
+        check_overlap = TRUE,
+        nudge_x = dotSize * 0.01,
+        nudge_y = dotSize * 0.01,
+        size = fontAnnotSize,
+        show.legend = FALSE
+      )
   }
 
   return(p)

@@ -33,13 +33,13 @@ plotScatterVAF(
 
 \item{colors}{A named color vector for private in sample 1, in sample 2 and shared breakpoints/mutations.}
 
-\item{fontLabelSize}{Number indicating size of the labels.}
+\item{fontLabelSize}{Number indicating size of the annotated text.}
 
 \item{dotSize}{Size of the dots.}
 
 \item{annotGenes}{FALSE by default. TRUE if you want to make dot annotation. Extra column needs to be added to mutationTable if this is TRUE.}
 
-\item{fontAnnotSize}{#' @param fontLabelSize Number indicating size of the annotated text.}
+\item{fontAnnotSize}{Number indicating size of the annotated text.}
 
 \item{scaleAFs}{Scale AFs per-sample by the highest AF within each sample. Only recommended for data with significant normal contamination that you are confident contains at least one clonal mutation per sample.}
 }

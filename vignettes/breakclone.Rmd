@@ -225,6 +225,16 @@ breaks <- getSharedBreaks(
 )
 ```
 
+```{r}
+plotCNpairalleleSpecific(
+  segmentTable = segmentTable_AS,
+  pair = c("Patient1_Primary", "Patient1_Recurrence"),
+  breaks = breaks,
+  build = "hg19"
+)
+```
+
+
 # Clonality assessment using mutation
 
 For the clonality assessment using mutation data, the allele frequency is weighted according to the population frequency. A higher allele frequency is interpreted as a stronger indicator of clonal relatedness, while a higher population frequency is interpreted as diminishing the predictive value of the variant. To calculate the reference distribution of concordance scores, the TCGA Pan-Cancer Atlas breast cancer mutation calls were used available in the package as `brca`. 

@@ -264,8 +264,8 @@ exportSharedBreaks <- function(pair, segmentTable, outdir = ".", cnType = c("all
   }
 
   if (isTRUE(save)) {
-    print(paste0(pair[1], "-", pair[2], " pair doesn't contain shared breakpoints"))
-    write.table(shared_breaks, paste0(outdir, "/", pair[1], "-", pair[2], ".tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
+    message(paste0(pair[1], "-", pair[2], " pair doesn't contain shared breakpoints"))
+    fwrite(shared_breaks, paste0(outdir, "/", pair[1], "-", pair[2], ".tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
   }
 
   return(shared_breaks)
@@ -290,7 +290,14 @@ getSharedBreaks <- function(segmentTable, pairs, outdir = ".", cnType = c("allel
     maxgap <- calculateMaxGap(segmentTable, cnType)
   }
   res <- apply(pairs, 1, function(x) {
-    exportSharedBreaks(as.character(x), segmentTable, outdir, cnType, maxgap, save)
+    exportSharedBreaks(
+      as.character(x),
+      segmentTable,
+      outdir,
+      cnType,
+      maxgap,
+      save
+    )
   })
   names(res) <- paste0(pairs[[1]], "-", pairs[[2]])
   return(res)

@@ -3,7 +3,7 @@ Type: Package
 Title: Estimating clonal relatedness probability between tumour pairs
 Version: 0.3.3
 Author: argymeg
-Maintainer: argymeg <argymeg@gmail.com>
+Maintainer: Maria Roman Escorza <maria.roman-escorza@kcl.ac.uk>
 Description: Estimate clonal relatedness probability between tumour pairs based on copy number breakpoints or mutation data.
 License: MIT
 Encoding: UTF-8
