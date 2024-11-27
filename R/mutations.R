@@ -84,8 +84,7 @@ getScoreMutations <- function(mutationTable, pair, populationMutations, nAdditio
 #' @return A data frame listing the tumour pairs contained in \code{pairs}, their relatedness scores and p-values for relatedness.
 #' @export
 calculateRelatednessMutations <- function(mutationTable, pairs, additionalMutations = NULL, nAdditionalSamples = 0, reference = NULL, excludeChromosomes = "chrY", scaleAFs = FALSE) {
-
-  if (!isFALSE(excludeChromosomes)){
+  if (!isFALSE(excludeChromosomes)) {
     mutationTable <- mutationTable[!excludeChromosomes, on = "Chr"]
   }
 
@@ -144,7 +143,7 @@ makeReferenceMutations <- function(mutationTable, pairs, patients = NULL, delimi
 
   message("Making reference based on ", nrow(refPairs), " possible pairs, this might take a while")
 
-  if (!isFALSE(excludeChromosomes)){
+  if (!isFALSE(excludeChromosomes)) {
     mutationTable <- mutationTable[!excludeChromosomes, on = "Chr"]
   }
 

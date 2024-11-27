@@ -91,13 +91,17 @@ inferPairs <- function(segmentTable, delimiter = "_") {
 
   # Generate all possible combinations for each patient
   pairs <- lapply(splitSamples, function(patientSamples) {
-    if (length(patientSamples) < 2) return(NULL)  # Skip patients with fewer than 2 samples
+    if (length(patientSamples) < 2) {
+      return(NULL)
+    } # Skip patients with fewer than 2 samples
     combn(patientSamples, 2, simplify = FALSE)
   })
 
   # Combine into a data.table
   pairs <- rbindlist(lapply(pairs, function(pairs) {
-    if (is.null(pairs)) return(NULL)  # Skip NULL results
+    if (is.null(pairs)) {
+      return(NULL)
+    } # Skip NULL results
     do.call(rbind, lapply(pairs, function(pair) {
       data.table(Sample1 = pair[1], Sample2 = pair[2])
     }))
