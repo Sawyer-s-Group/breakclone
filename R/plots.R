@@ -534,6 +534,8 @@ plotCNpairalleleSpecific <- function(segmentTable, pair, ASCATobj = NULL, breaks
 
     data(list = paste0('bins_', build))
     template <- bins
+
+    # Order by position in the genome
     template$segs_sample1 <- NA
     template$segs_sample2 <- NA
 
@@ -550,9 +552,10 @@ plotCNpairalleleSpecific <- function(segmentTable, pair, ASCATobj = NULL, breaks
          segs_sample2 := nTotal]
   }
 
-  template$bin <- 1:nrow(template)
+  template$chr <- factor(template$chr, c(1:22, 'X', 'Y'))
   template <- template[!excludeChromosomes, on = "chr"]
   template <- template[order(chr, start), ]
+  template$bin <- 1:nrow(template)
 
   # define chromosome and centromere limits
   chrLims <- getChrLims(template)
@@ -827,6 +830,34 @@ plotSummary <- function(summary, sortBy = c("verdict", "fraction_shared"), color
     )
     draw(ha_list, heatmap_legend_list = list(l1, l2, l3, l4))
   }
+}
+
+#' Plot pie chart
+#'
+#' @param summary A data frame listing the clonality results \code{clonalityResults}, clonality verdict based on the thresholds and number and fraction of shared and private breakpoints per sample.
+#' @param colorClonality A character vector with colors for related, ambiguous and unrelated samples.
+#' @author Maria Roman Escorza
+#' \email{maria.roman-escorza@@kcl.ac.uk}
+#' @return Pie chart
+#' @export
+plotPie <- function(summary, colorClonality = c("#F5C61AD9", "#FB4F14D9", "#660C21D9")){
+  perc <- as.data.frame(prop.table(table(summary$verdict)))
+  perc$n <- table(summary$verdict)
+
+  p <- ggplot(perc, aes(x = "", y = Freq, fill = Var1)) +
+    geom_col() +
+    geom_text(
+      aes(label = paste0(Freq*100, '% (n=', n, ')')),
+      color = 'black',
+      position = position_stack(vjust = 0.5),
+      show.legend = FALSE,
+      fontface = "bold") +
+    guides(fill = guide_legend(title = "Clonality")) +
+    scale_fill_manual(values = colorClonality) +
+    coord_polar(theta = "y") +
+    theme_void()
+
+  return(p)
 }
 
 
