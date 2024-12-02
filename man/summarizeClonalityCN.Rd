@@ -10,7 +10,8 @@ summarizeClonalityCN(
   thres_ambiguous = 0.05,
   thres_related = 0.01,
   cnType = c("alleleSpecific", "VCF"),
-  maxgap = NULL
+  maxgap = NULL,
+  excludeChromosomes = "Y"
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ summarizeClonalityCN(
 \item{cnType}{The type of copy number data provided. Currently supported options are a custom allele specific data format, and standard copy number VCF files.}
 
 \item{maxgap}{The maximum gap between two breakpoints for them to be considered concordant. If unspecified, it is automatically set to 5 times the average interprobe distance of the assay.}
+
+\item{excludeChromosomes}{The name(s) of any chromosomes to be excluded. Need to be set to FALSE to keep all the chromosomes.}
 }
 \value{
 A data frame listing the clonality results \code{clonalityResults}, clonality verdict based on the thresholds and number and fraction of shared and private breakpoints per sample.

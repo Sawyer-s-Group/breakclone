@@ -239,7 +239,11 @@ makeReferenceCN <- function(segmentTable, pairs, patients = NULL, delimiter = "_
   return(reference)
 }
 
-exportSharedBreaks <- function(pair, segmentTable, outdir = ".", cnType = c("alleleSpecific", "VCF"), maxgap, save) {
+exportSharedBreaks <- function(pair, segmentTable, outdir = ".", cnType = c("alleleSpecific", "VCF"), maxgap, save, excludeChromosomes) {
+  if (!isFALSE(excludeChromosomes)) {
+    segmentTable <- segmentTable[!excludeChromosomes, on = "Chr"]
+  }
+
   sample1 <- segmentTable[segmentTable$SampleID == pair[1], ]
   sample2 <- segmentTable[segmentTable$SampleID == pair[2], ]
 
@@ -280,11 +284,12 @@ exportSharedBreaks <- function(pair, segmentTable, outdir = ".", cnType = c("all
 #' @param cnType The type of copy number data provided. Currently supported options are a custom allele specific data format, and standard copy number VCF files.
 #' @param maxgap The maximum gap between two breakpoints for them to be considered concordant. If unspecified, it is automatically set to 5 times the average interprobe distance of the assay.
 #' @param save TRUE if want to export the shared mutations.
+#' @param excludeChromosomes The name(s) of any chromosomes to be excluded. Need to be set to FALSE to keep all the chromosomes.
 #' @author Maria Roman Escorza
 #' \email{maria.roman-escorza@@kcl.ac.uk}
 #' @return List of shared breakpoints per pair It will generate a tsv file per pair in outdir with shared breakpoints.
 #' @export
-getSharedBreaks <- function(segmentTable, pairs, outdir = ".", cnType = c("alleleSpecific", "VCF"), maxgap = NULL, save = FALSE) {
+getSharedBreaks <- function(segmentTable, pairs, outdir = ".", cnType = c("alleleSpecific", "VCF"), maxgap = NULL, save = FALSE, excludeChromosomes = "Y") {
   cnType <- match.arg(cnType)
   if (is.null(maxgap)) {
     maxgap <- calculateMaxGap(segmentTable, cnType)
@@ -296,7 +301,8 @@ getSharedBreaks <- function(segmentTable, pairs, outdir = ".", cnType = c("allel
       outdir,
       cnType,
       maxgap,
-      save
+      save,
+      excludeChromosomes
     )
   })
   names(res) <- paste0(pairs[[1]], "-", pairs[[2]])
@@ -311,11 +317,12 @@ getSharedBreaks <- function(segmentTable, pairs, outdir = ".", cnType = c("allel
 #' @param thres_related P-value to define related thres_related=0.05 by default.
 #' @param cnType The type of copy number data provided. Currently supported options are a custom allele specific data format, and standard copy number VCF files.
 #' @param maxgap The maximum gap between two breakpoints for them to be considered concordant. If unspecified, it is automatically set to 5 times the average interprobe distance of the assay.
+#' @param excludeChromosomes The name(s) of any chromosomes to be excluded. Need to be set to FALSE to keep all the chromosomes.
 #' @author Maria Roman Escorza
 #' \email{maria.roman-escorza@@kcl.ac.uk}
 #' @return A data frame listing the clonality results \code{clonalityResults}, clonality verdict based on the thresholds and number and fraction of shared and private breakpoints per sample.
 #' @export
-summarizeClonalityCN <- function(clonalityResults, segmentTable, thres_ambiguous = 0.05, thres_related = 0.01, cnType = c("alleleSpecific", "VCF"), maxgap = NULL) {
+summarizeClonalityCN <- function(clonalityResults, segmentTable, thres_ambiguous = 0.05, thres_related = 0.01, cnType = c("alleleSpecific", "VCF"), maxgap = NULL, excludeChromosomes = 'Y') {
   cnType <- match.arg(cnType)
   if (is.null(maxgap)) {
     maxgap <- calculateMaxGap(segmentTable, cnType)
@@ -323,7 +330,7 @@ summarizeClonalityCN <- function(clonalityResults, segmentTable, thres_ambiguous
 
   clonalityResults$verdict <- factor(ifelse(clonalityResults$pair_ps <= thres_related, "Related", ifelse(clonalityResults$pair_ps <= thres_ambiguous, "Ambiguous", "Unrelated")), levels = c("Related", "Ambiguous", "Unrelated"))
   clonalityResults$shared <- as.numeric(lapply(apply(clonalityResults[, 1:2], 1, function(x) {
-    exportSharedBreaks(pair = as.character(x), segmentTable = segmentTable, cnType = cnType, maxgap = maxgap, save = FALSE)
+    exportSharedBreaks(pair = as.character(x), segmentTable = segmentTable, cnType = cnType, maxgap = maxgap, save = FALSE, excludeChromosomes)
   }), nrow))
   clonalityResults$private_sample1 <- apply(clonalityResults, 1, function(x) nrow(segmentTable[segmentTable$SampleID == x[[1]], ]) * 2) - clonalityResults[["shared"]]
   clonalityResults$private_sample2 <- apply(clonalityResults, 1, function(x) nrow(segmentTable[segmentTable$SampleID == x[[2]], ]) * 2) - clonalityResults[["shared"]]

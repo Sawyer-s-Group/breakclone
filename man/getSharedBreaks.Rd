@@ -10,7 +10,8 @@ getSharedBreaks(
   outdir = ".",
   cnType = c("alleleSpecific", "VCF"),
   maxgap = NULL,
-  save = FALSE
+  save = FALSE,
+  excludeChromosomes = "Y"
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ getSharedBreaks(
 \item{maxgap}{The maximum gap between two breakpoints for them to be considered concordant. If unspecified, it is automatically set to 5 times the average interprobe distance of the assay.}
 
 \item{save}{TRUE if want to export the shared mutations.}
+
+\item{excludeChromosomes}{The name(s) of any chromosomes to be excluded. Need to be set to FALSE to keep all the chromosomes.}
 }
 \value{
 List of shared breakpoints per pair It will generate a tsv file per pair in outdir with shared breakpoints.
