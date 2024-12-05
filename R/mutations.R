@@ -1,3 +1,7 @@
+#' @import data.table
+#' @import GenomicRanges
+#' @import S4Vectors
+
 getHitMut <- function(sample1, sample2, pair, scaleAFs) {
   sample1_granges <- makeGRangesFromDataFrame(sample1, start.field = "Pos", end.field = "Pos", keep.extra.columns = TRUE)
   sample2_granges <- makeGRangesFromDataFrame(sample2, start.field = "Pos", end.field = "Pos", keep.extra.columns = TRUE)
