@@ -249,6 +249,7 @@ exportSharedBreaks <- function(pair, segmentTable, outdir = ".", cnType = c("all
   ]
 
   if (nrow(sample1) == 0 | nrow(sample2) == 0) {
+    message(pair, ' any of these copy number profiles is flat')
     shared_breaks <- setNames(data.frame(matrix(ncol = 4,
                                                 nrow = 0)), c("seqnames", "start", "end", "break_shared"))
   } else {
