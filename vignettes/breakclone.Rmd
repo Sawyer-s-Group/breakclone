@@ -228,7 +228,7 @@ breaks <- getSharedBreaks(
 ```
 
 ```{r}
-plotCNpairalleleSpecific(
+breaplotCNpairalleleSpecific(
   segmentTable = segmentTable_AS,
   pair = c("Patient1_Primary", "Patient1_Recurrence"),
   breaks = breaks,

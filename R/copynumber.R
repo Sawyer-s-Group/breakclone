@@ -243,35 +243,48 @@ exportSharedBreaks <- function(pair, segmentTable, outdir = ".", cnType = c("all
   if (!isFALSE(excludeChromosomes)) {
     segmentTable <- segmentTable[!excludeChromosomes, on = "Chr"]
   }
+  sample1 <- segmentTable[segmentTable$SampleID == pair[1],
+  ]
+  sample2 <- segmentTable[segmentTable$SampleID == pair[2],
+  ]
 
-  sample1 <- segmentTable[segmentTable$SampleID == pair[1], ]
-  sample2 <- segmentTable[segmentTable$SampleID == pair[2], ]
-
-  hits_start <- getHitCN(sample1, sample2, pair, position = "start", cnType, maxgap)
-  hits_end <- getHitCN(sample1, sample2, pair, position = "end", cnType, maxgap)
-
-  start <- do.call("rbind", lapply(hits_start, function(x) as.data.frame(x)))[, -c(4, 5)]
-  end <- do.call("rbind", lapply(hits_end, function(x) as.data.frame(x)))[, -c(4, 5)]
-
-  if (nrow(start) == 0 & nrow(end) == 0) {
-    shared_breaks <- setNames(data.frame(matrix(ncol = 4, nrow = 0)), c("seqnames", "start", "end", "break_shared"))
-  } else if (nrow(start) == 0) {
-    end$break_shared <- "end"
-    shared_breaks <- end
-  } else if (nrow(end) == 0) {
-    start$break_shared <- "start"
-    shared_breaks <- start
+  if (nrow(sample1) == 0 | nrow(sample2) == 0) {
+    shared_breaks <- setNames(data.frame(matrix(ncol = 4,
+                                                nrow = 0)), c("seqnames", "start", "end", "break_shared"))
   } else {
-    start$break_shared <- "start"
-    end$break_shared <- "end"
-    shared_breaks <- rbind(start, end)
+    hits_start <- getHitCN(sample1, sample2, pair, position = "start",
+                           cnType, maxgap)
+    hits_end <- getHitCN(sample1, sample2, pair, position = "end",
+                         cnType, maxgap)
+    start <- do.call("rbind", lapply(hits_start, function(x) as.data.frame(x)))[,
+                                                                                -c(4, 5)]
+    end <- do.call("rbind", lapply(hits_end, function(x) as.data.frame(x)))[,
+                                                                            -c(4, 5)]
+    if (nrow(start) == 0 & nrow(end) == 0) {
+      shared_breaks <- setNames(data.frame(matrix(ncol = 4,
+                                                  nrow = 0)), c("seqnames", "start", "end", "break_shared"))
+    }
+    else if (nrow(start) == 0) {
+      end$break_shared <- "end"
+      shared_breaks <- end
+    }
+    else if (nrow(end) == 0) {
+      start$break_shared <- "start"
+      shared_breaks <- start
+    }
+    else {
+      start$break_shared <- "start"
+      end$break_shared <- "end"
+      shared_breaks <- rbind(start, end)
+    }
   }
 
   if (isTRUE(save)) {
     message(paste0(pair[1], "-", pair[2], " pair doesn't contain shared breakpoints"))
-    fwrite(shared_breaks, paste0(outdir, "/", pair[1], "-", pair[2], ".tsv"), sep = "\t", row.names = FALSE, quote = FALSE)
+    fwrite(shared_breaks, paste0(outdir, "/", pair[1], "-",
+                                 pair[2], ".tsv"), sep = "\t", row.names = FALSE,
+           quote = FALSE)
   }
-
   return(shared_breaks)
 }
 
