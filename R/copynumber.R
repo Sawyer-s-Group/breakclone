@@ -328,6 +328,10 @@ summarizeClonalityCN <- function(clonalityResults, segmentTable, thres_ambiguous
     maxgap <- calculateMaxGap(segmentTable, cnType)
   }
 
+  if (cnType == 'alleleSpecific'){
+    segmentTable <- rbindlist(lapply(split(segmentTable, segmentTable$SampleID), callalleleSpecificCN))
+  }
+
   clonalityResults$verdict <- factor(ifelse(clonalityResults$pair_ps <= thres_related, "Related", ifelse(clonalityResults$pair_ps <= thres_ambiguous, "Ambiguous", "Unrelated")), levels = c("Related", "Ambiguous", "Unrelated"))
   clonalityResults$shared <- as.numeric(lapply(apply(clonalityResults[, 1:2], 1, function(x) {
     exportSharedBreaks(pair = as.character(x), segmentTable = segmentTable, cnType = cnType, maxgap = maxgap, save = FALSE, excludeChromosomes = excludeChromosomes)
@@ -338,5 +342,6 @@ summarizeClonalityCN <- function(clonalityResults, segmentTable, thres_ambiguous
   clonalityResults$fraction_private_sample1 <- clonalityResults$private_sample1 / clonalityResults$total
   clonalityResults$fraction_private_sample2 <- clonalityResults$private_sample2 / clonalityResults$total
   clonalityResults$fraction_shared <- clonalityResults$shared / clonalityResults$total
+
   return(clonalityResults)
 }

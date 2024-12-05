@@ -206,12 +206,14 @@ reference <- makeReferenceCN(
 results <- calculateRelatednessCn(
   segmentTable = segmentTable_AS,
   pairs = pairs_cnAS,
-  reference = reference
+  reference = reference,
+  cnType = 'alleleSpecific'
 )
 
 summary <- summarizeClonalityCN(
   clonalityResults = results,
-  segmentTable = segmentTable_AS
+  segmentTable = segmentTable_AS,
+  cnType = 'alleleSpecific'
 )
 head(summary)
 ```
