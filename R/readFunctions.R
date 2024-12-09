@@ -1,4 +1,5 @@
 #' @import data.table
+#' @import vcfR
 
 #' @title Read allele-specific copy number data from a directory
 #'
@@ -57,9 +58,15 @@ readAlleleSpecific <- function(directory, pattern = "*_Segments_AbsCN_alleleSpec
 readVCFCn <- function(directory, pattern = "*.vcf") {
   parseVCF <- function(x) {
     vcf <- vcfR::read.vcfR(x, verbose = FALSE)
-    extracted_fields <- vcfR::vcfR2tidy(vcf, info_only = TRUE, info_fields = c("SVTYPE", "END", "BINS", "SVLEN"))$fix[, c("CHROM", "POS", "END", "BINS", "SVTYPE", "SVLEN")]
     samplename <- colnames(vcf@gt)[2]
-    return(cbind(samplename, extracted_fields, stringsAsFactors = FALSE))
+
+    if (nrow(vcf@fix) == 0){
+      message(samplename, ' has a flat copy number profile')
+    } else {
+      extracted_fields <- vcfR::vcfR2tidy(vcf, info_only = TRUE, info_fields = c("SVTYPE", "END", "BINS", "SVLEN"))$fix[, c("CHROM", "POS", "END", "BINS", "SVTYPE", "SVLEN")]
+
+      return(cbind(samplename, extracted_fields, stringsAsFactors = FALSE))
+    }
   }
   fileList <- dir(directory, pattern, full.names = TRUE)
   segmentList <- lapply(fileList, parseVCF)
